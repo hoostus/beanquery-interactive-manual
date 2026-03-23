@@ -1,3 +1,12 @@
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "beanquery",
+#     "beancount",
+#     "marimo",
+# ]
+# ///
+
 import marimo
 
 __generated_with = "0.20.4"
@@ -198,12 +207,12 @@ def _(mo):
     Beancount’s parsed list of entries is like an in-memory database represented in a form of several tables. Beanquery is a command-line tool that acts like a client to that in-memory database in which you can type queries in a variant of SQL. You invoke it like this:
 
     ```shell
-    beanquery  test.bean
+    bean-query  test.bean
     Input file: "Beancount"
     Ready with 3 directives (2 postings in 1 transactions, 0 validation errors)
     beanquery>
     ```
-    Beanquery started as an experiment in beancount v2, but in v3 (when **bean-web** has been discontinued) became pretty much the only tool to query information out of beancount ledger. One can say, that beancount has moved towrds the [Self-service business intelligence](https://www.techtarget.com/searchbusinessanalytics/definition/self-service-business-intelligence-BI) model.
+    Beanquery started as an experiment in beancount v2, but in v3 (when **bean-report** and **bean-web** have been discontinued) became practically the only tool to query information out of beancount ledger. Thus one can say, that in v3 beancount has moved towards the [Self-service business intelligence](https://www.techtarget.com/searchbusinessanalytics/definition/self-service-business-intelligence-BI) model instead of providing off the shelf ready to use reports.
     """)
     return
 
@@ -248,7 +257,7 @@ def _(mo):
     e.g.:
 
     ```shell
-    beanquery  test.bean
+    bean-query  test.bean
     Input file: "Beancount"
     Ready with 3 directives (2 postings in 1 transactions, 0 validation errors)
     beanquery>
@@ -268,7 +277,7 @@ def _(heading, how_to_start_h):
     _prev = how_to_start_h
     how_to_get_help_h = heading(2, "How to get help")
     how_to_get_help_h
-    return
+    return (how_to_get_help_h,)
 
 
 @app.cell
@@ -290,6 +299,21 @@ def _(mo):
 
     beanquery>
     ```
+
+    To get help on a specific command type .help `<command name>`
+
+    E.g.:
+
+    ```
+    beanquery> .help select
+    Extract data from a query on the postings.
+
+    The general form of a SELECT statement loosely follows SQL syntax, with
+    some mild and idiomatic extensions:
+    .........
+
+    ```
+
 
     To get a list of the tables, available for beancount type `.tables`
 
@@ -368,14 +392,97 @@ def _(mo):
 
 
 @app.cell
+def _(heading, how_to_get_help_h):
+    _ = how_to_get_help_h
+    making_hd=heading(2, "Making SELECT Queries", number=  True)
+    making_hd
+    return (making_hd,)
+
+
+@app.cell
+def _(heading, making_hd):
+    _= making_hd
+    select_intro_hd=heading(3, "Introduction", number=  True)
+    select_intro_hd
+    return (select_intro_hd,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    The beanquery SELECT query loosely follows standard SQL syntax and can be applied to the set tables list of which can be derived by issuing the `.tables` command.
+
+    ```shell
+    beanquery> .tables
+    accounts
+    balances
+    commodities
+    documents
+    entries
+    events
+    notes
+    postings
+    prices
+    transactions
+    beanquery>
+    ```
+
+    List of fields in every table can be obtained using the `.describe <table_name>` command
+
+    It is relatively easy therefore for anyone familiar with SQL to extract needed information, but several caveats / confusions need to be noted.
+
+    **Note:** for someone, not familiar with SQL, some of the material, described in this paragraph, may not be clear, as it refers to the information described further in details, in this case skip the material, which is not clear and come back to it later.
+    """)
+    return
+
+
+@app.cell
+def _(heading, select_intro_hd):
+    _ = select_intro_hd
+    old_vs_new_hd = heading(4, "Old vs new syntax", number=True)
+    old_vs_new_hd
+    return (old_vs_new_hd,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Originally **beanquery** was designed to be use to query postings table only. In this situation the **FROM** part of the SQL query was "hijacked" to be used for transaction-level filtering and **WHERE** was used for posting-level filtering, which introduced so-called  two-level filtering syntax
+
+    So, the SELECT query structure looked like this:
+
+    ```text
+    SELECT [DISTINCT] [<targets>|*]
+    [FROM <entry-filter-expression> [OPEN ON <date>] [CLOSE [ON <date>]] [CLEAR]]
+    [WHERE <posting-filter-expression>]
+    [GROUP BY <groups>]
+    [ORDER BY <groups> [ASC|DESC]]
+    [LIMIT num]
+    ```
+
+    Let us call is the query form A.
+
+    **Example:**
+    """)
+    return
+
+
+@app.cell
 def _(ledger_editor):
     _ledger = """\
     2023-01-01 open Assets:Cash USD
     2023-01-01 open Expenses:Food USD
 
-    2023-01-10 * "Shop"
+    2023-01-01 * "Shopping 1"
+      tr_meta: "tr1_meta"
+      Expenses:Food   10 USD
+      Assets:Cash    -10 USD
+
+    2023-01-02 * "Shopping 2"
       Expenses:Food   20 USD
-      Assets:Cash    -20 USD"""
+      post_meta: "tr2_pst1_meta"
+      Assets:Cash    -20 USD
+      """
 
     ledger_ui = ledger_editor(_ledger, label="Ledger:")
     ledger_ui
@@ -384,7 +491,10 @@ def _(ledger_editor):
 
 @app.cell
 def _(query_editor):
-    _sql = "select *"
+    _sql = """\
+    SELECT date, description, position, meta
+    FROM meta['post_meta'] = "tr2_pst1_meta"
+    """
     sql_ui = query_editor(_sql, label="BeanQuery SQL:")
     sql_ui
     return (sql_ui,)
@@ -393,6 +503,162 @@ def _(query_editor):
 @app.cell
 def _(ledger_ui, query_output, sql_ui):
     query_output(ledger_ui.value, sql_ui.value) 
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Note that in this example the FROM clause is used to filter based on the posting flag and WHERE clause is used to filter based on the
+    """)
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Later on, in beancount v3, beanquery was extended to query more tables (see above), in this situation the FROM part was needed again, so the new form of the SELECT query was introduced
+
+    ```text
+    SELECT [DISTINCT] [<targets>|*]
+    [FROM #<table-name>]
+    [WHERE <posting-filter-expression>]
+    [GROUP BY <groups>]
+    [ORDER BY <groups> [ASC|DESC]]
+    [LIMIT num]
+    ```
+    Let us call it query form B.
+
+    Note, that:
+    * Form B is activated by adding the # symbol in front of the table name
+    * Form B allows to query tables, different from postings table, but in case it is used to query postings table (which is possible), it lacks some functionality, applicable to postings table, namely the `[OPEN ON <date>] [CLOSE [ON <date>]] [CLEAR]` part. Later about this functinality later.
+
+    At the moment beanquery supports both query types. Later in this text the traditional query type will be used where possible, and a new query type will be used where needed
+    """)
+    return
+
+
+@app.cell
+def _(heading, old_vs_new_hd):
+    _=old_vs_new_hd
+    posting_vs_transaction_hd_fields = heading(4, "Posting fields vs transaction fields", number=True)
+    posting_vs_transaction_hd_fields
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    The structure of transactions and entries can be explained by the following simplified diagram:
+    """)
+    return
+
+
+@app.cell
+def _(mo):
+    mo.image("images/transactions_to_postings.png", alt="Diagram of transactions and postings")
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    The contents of a ledger is parsed into a list of directives, most of which are “Transaction” objects which contain two or more “Posting” objects. Postings are always linked only to a single transaction (they are never shared between transactions). Each posting refers to its parent transaction but has a unique account name, amount and associated lot (possibly with a cost), a price and some other attributes. The parent transaction itself contains a few useful attributes as well, such as a date, the name of a payee, a narration string, a flag, links, tags, etc.
+
+    So, one can think, that such attribute as **date** or **narration** belong to transaction object, whilst attributes like **account** belongs to posting object. However (at least in the latest version of beanquery) all of the transaction-level fields are also made avaiable in the posting objects (only exeption being the transaction meta, which is not available from the posting). One can check this by comparing the outputs of the **`.describe postings`** and **`.describe transactions`** commands.
+
+    Let us look at this in the following example
+    """)
+    return
+
+
+@app.cell
+def _(ledger_editor):
+    _ledger = """\
+    2023-01-01 open Assets:Cash USD
+    2023-01-01 open Expenses:Food USD
+
+    2023-01-01 * "Shopping 1"
+      Expenses:Food   10 USD
+      Assets:Cash    -10 USD
+
+    2023-01-02 * "Shopping 2"
+      Expenses:Food   20 USD
+      Assets:Cash    -20 USD
+      """
+
+    ledger_ui_post_vs_tr = ledger_editor(_ledger, label="Ledger 1:")
+    ledger_ui_post_vs_tr
+    return (ledger_ui_post_vs_tr,)
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT account, narration
+    FROM date = 2023-01-01
+    """
+    sql_ui_trans_level = query_editor(_sql, label="Let us use transaction-level filtering to filter posting at the date 2023-01-01")
+    sql_ui_trans_level
+    return (sql_ui_trans_level,)
+
+
+@app.cell
+def _(ledger_ui_post_vs_tr, query_output, sql_ui_trans_level):
+    query_output(ledger_ui_post_vs_tr.value, sql_ui_trans_level.value)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT account, narration
+    WHERE date = 2023-01-01
+    """
+    sql_ui_posting_level = query_editor(_sql, label="The same result at posting level filtering")
+    sql_ui_posting_level
+    return (sql_ui_posting_level,)
+
+
+@app.cell
+def _(ledger_ui_post_vs_tr, query_output, sql_ui_posting_level):
+    query_output(ledger_ui_post_vs_tr.value, sql_ui_posting_level.value)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT narration
+    FROM #transactions
+    WHERE date = 2023-01-01
+    """
+    sql_ui_selecting_from_tr = query_editor(_sql, label="Let us query narration of the transaction at the date 2023-01-01 using the new query format")
+    sql_ui_selecting_from_tr
+    return (sql_ui_selecting_from_tr,)
+
+
+@app.cell
+def _(ledger_ui_post_vs_tr, query_output, sql_ui_selecting_from_tr):
+    query_output(ledger_ui_post_vs_tr.value, sql_ui_selecting_from_tr.value)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT account, narration
+    FROM #postings
+    WHERE date = 2023-01-01
+    """
+    sql_ui_selecting_from_postings = query_editor(_sql, label="Now let us try to access the same narration and and also an account but from postings")
+    sql_ui_selecting_from_postings
+    return (sql_ui_selecting_from_postings,)
+
+
+@app.cell
+def _(ledger_ui_post_vs_tr, query_output, sql_ui_selecting_from_postings):
+    query_output(ledger_ui_post_vs_tr.value, sql_ui_selecting_from_postings.value)
     return
 
 
