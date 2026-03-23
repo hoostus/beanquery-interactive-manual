@@ -394,7 +394,7 @@ def _(mo):
 @app.cell
 def _(heading, how_to_get_help_h):
     _ = how_to_get_help_h
-    making_hd=heading(2, "Making SELECT Queries", number=  True)
+    making_hd=heading(2, "SELECT Queries", number=  True)
     making_hd
     return (making_hd,)
 
@@ -439,9 +439,17 @@ def _(mo):
 @app.cell
 def _(heading, select_intro_hd):
     _ = select_intro_hd
-    old_vs_new_hd = heading(4, "Traditional vs #table syntax", number=True)
-    old_vs_new_hd
-    return (old_vs_new_hd,)
+    caviats_hd = heading(4, "Caveats", number=True)
+    caviats_hd
+    return (caviats_hd,)
+
+
+@app.cell
+def _(caviats_hd, heading):
+    _ = caviats_hd
+    trad_vs_had_table_hd = heading(5, "Traditional vs #table syntax", number=True)
+    trad_vs_had_table_hd
+    return
 
 
 @app.cell
@@ -565,11 +573,11 @@ def _(query_output, simple_ledger_ui, sql_ui_hash_table_accounts):
 
 
 @app.cell
-def _(heading, old_vs_new_hd):
-    _=old_vs_new_hd
-    posting_vs_transaction_hd_fields = heading(4, "Posting fields vs transaction fields", number=True)
+def _(caviats_hd, heading):
+    _=caviats_hd
+    posting_vs_transaction_hd_fields = heading(5, "Posting fields vs transaction fields", number=True)
     posting_vs_transaction_hd_fields
-    return
+    return (posting_vs_transaction_hd_fields,)
 
 
 @app.cell
@@ -662,6 +670,110 @@ def _(ledger_ui_post_vs_tr, query_output, sql_ui_posting_level):
 def _(mo):
     mo.md(r"""
     **Conclusion:** at the moment there seems to be [little reason](https://groups.google.com/g/beancount/c/HVK3_6p1FjM) to use the FROM clause transaction level-filtering in the SELECT query, as everything can be done in the WHERE part
+    """)
+    return
+
+
+@app.cell
+def _(heading, posting_vs_transaction_hd_fields):
+    _=posting_vs_transaction_hd_fields
+    jointing_posting_transaction_hd = heading(5, "Pre-jointed postings and related transactions", number=True)
+    jointing_posting_transaction_hd
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Suppose we need to join postings with related transactions (e.g. to access posting meta field)
+    In a traditional SQL environment we would probably have to do something like this.
+
+    ```sql
+    SELECT
+        postings.*,
+        transactions.meta
+    FROM postings
+    JOIN transactions
+        ON postings.transaction_id = transactions.id
+    ```
+    Beanquery however does not support [yet](https://groups.google.com/g/beancount/c/O0x0eZEp-Lk/m/WFnOS_flEQAJ) table joining, from the other side postings table returns records that include a reference to the transaction that contains them (so, they are kind of pre-joint already).
+
+    One can check this by issuing the `.describe postings` command:
+
+    ```shell
+    beanquery> .describe postings
+    table postings:
+      ....
+      entry (transaction)    <== this is a reference to the transaction from the posting
+      accounts (set[str])
+    beanquery>
+    ```
+    Let us see, how we can do this my pulling both transaction meta and postings meta:
+    """)
+    return
+
+
+@app.cell
+def _(ledger_editor):
+    _ledger = """\
+    2023-01-01 open Assets:Cash USD
+    2023-01-01 open Expenses:Food USD
+
+    2023-01-01 * "Shopping 1"
+      my_meta: "tr1_meta"     ; <= transaction-level meta
+      Expenses:Food   10 USD
+      my_meta: "tr1_posting1" ; <= posting-level meta
+      Assets:Cash    -10 USD
+      my_meta: "tr1_posting2" ; <= posting-level meta again
+
+    2023-01-02 * "Shopping 2"
+      my_meta: "tr2_meta"
+      Expenses:Food   20 USD
+      my_meta: "tr2_posting1"
+      Assets:Cash    -20 USD
+      my_meta: "tr2_posting1"
+      """
+
+    ledger_ui_with_meta = ledger_editor(_ledger, label="Ledger:")
+    ledger_ui_with_meta
+    return (ledger_ui_with_meta,)
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT 
+      date, narration, account, 
+      meta['my_meta'] as posting_meta, 
+      entry.meta['my_meta'] as trans_meta
+    """
+    sql_ui_trans_meta = query_editor(_sql, label="Pulling both transaction-level and posting-level meta together")
+    sql_ui_trans_meta
+    return (sql_ui_trans_meta,)
+
+
+@app.cell
+def _(ledger_ui_with_meta, query_output, sql_ui_trans_meta):
+    query_output(ledger_ui_with_meta.value, sql_ui_trans_meta.value)
+    return
+
+
+@app.cell
+def _(heading, posting_vs_transaction_hd_fields):
+    _=posting_vs_transaction_hd_fields
+    select_q_conclusions_hd = heading(4, "Conclusions on using the SELECT Queries", number=True)
+    select_q_conclusions_hd
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    From everything mentioned above one can probably make the following practical conclusions on usage of the SELECT query in beancount.
+
+    * use traditional form of the beanquery query on postings
+    * use the #table form for all other tables
+    * no particular need to use the **FROM** - clause filtering, as all the fields are also available for the **WHERE** clause
     """)
     return
 
