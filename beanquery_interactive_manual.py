@@ -35,6 +35,8 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _():
+    import marimo as mo
+
     import io
 
     from beancount.loader import load_string
@@ -44,42 +46,8 @@ def _():
     from beanquery.query import run_query
     from beanquery.query_render import render_text
 
-    import marimo as mo
-
-    HEADING_COLOR = "#1e40af"
-    _heading_counters = [0, 0, 0, 0]  # h2, h3, h4, h5
-
-    def heading(level: int, text: str, number: bool = True) -> mo.Html:
-        """Render a colored markdown heading with optional hierarchical numbering.
-
-        Numbering starts from level 2 (level 1 is reserved for title).
-        """
-        prefix = ""
-        if number and 2 <= level <= len(_heading_counters) + 1:
-            idx = level - 2  # 0=h2, 1=h3, 2=h4
-            _heading_counters[idx] += 1
-            # Reset child counters
-            for i in range(idx + 1, len(_heading_counters)):
-                _heading_counters[i] = 0
-            prefix = ".".join(str(_heading_counters[i]) for i in range(idx + 1)) + ". "
-        return mo.md(
-            f"<h{level} style='color: {HEADING_COLOR}; margin-top: 0.1em !important; margin-bottom: 0.1em !important;'>"
-            f"{prefix}{text}</h{level}>"
-        )
 
     def get_beanquery_output(ledger_text: str, query: str) -> str:
-        """
-        Executes a BeanQuery command on a ledger string and returns output as text.
-
-        Args:
-            ledger_text (str): Beancount ledger as text
-            query (str): BeanQuery query
-
-        Returns:
-            str: formatted output (or formatted error)
-        """
-
-        # 1. Parse ledger
         entries, errors, options_map = load_string(ledger_text)
 
         if errors:
@@ -87,19 +55,34 @@ def _():
             bc_printer.print_errors(errors, file=buf)
             return buf.getvalue()
 
-        # 2. Run query
-        dcontext = display_context.DisplayContext()
-
         try:
             rtypes, rrows = run_query(entries, options_map, query)
 
             buf = io.StringIO()
-            render_text(rtypes, rrows, dcontext, buf)
+            dcontext = display_context.DisplayContext()
+
+            # -----------------------------------
+            # Detect PRINT (entry rows)
+            # -----------------------------------
+            is_entry_rows = (
+                rrows
+                and len(rrows[0]) == 1
+                and hasattr(rrows[0][0], "meta")
+            )
+
+            if is_entry_rows:
+                # PRINT output
+                entries = [row[0] for row in rrows]
+                bc_printer.print_entries(entries, file=buf)
+            else:
+                # SELECT output
+                render_text(rtypes, rrows, dcontext, buf)
 
             return buf.getvalue()
 
         except Exception as e:
             return f"BeanQuery error: {type(e).__name__}: {e}"
+            # raise e  # re-raise to show in marimo error UI
 
     def query_output(ledger_text: str, query: str) -> mo.Html:
         """
@@ -144,6 +127,29 @@ def _():
         """
         ui = mo.ui.code_editor(default_text, language="sql", label=label, show_copy_button=True, min_height=1, debounce=True)
         return ui
+
+
+    HEADING_COLOR = "#1e40af"
+    _heading_counters = [0, 0, 0, 0]  # h2, h3, h4, h5
+
+    def heading(level: int, text: str, number: bool = True) -> mo.Html:
+        """Render a colored markdown heading with optional hierarchical numbering.
+
+        Numbering starts from level 2 (level 1 is reserved for title).
+        """
+        prefix = ""
+        if number and 2 <= level <= len(_heading_counters) + 1:
+            idx = level - 2  # 0=h2, 1=h3, 2=h4
+            _heading_counters[idx] += 1
+            # Reset child counters
+            for i in range(idx + 1, len(_heading_counters)):
+                _heading_counters[i] = 0
+            prefix = ".".join(str(_heading_counters[i]) for i in range(idx + 1)) + ". "
+        return mo.md(
+            f"<h{level} style='color: {HEADING_COLOR}; margin-top: 0.1em !important; margin-bottom: 0.1em !important;'>"
+            f"{prefix}{text}</h{level}>"
+        )
+
 
     return heading, ledger_editor, mo, query_editor, query_output
 
@@ -775,6 +781,132 @@ def _(mo):
     * use the #table form for all other tables
     * no particular need to use the **FROM** - clause filtering, as all the fields are also available for the **WHERE** clause
     """)
+    return
+
+
+@app.cell
+def _(heading, int_beanquery_hd):
+    _=int_beanquery_hd
+    statement_operators_hd = heading(3, "Statement operators", number=True)
+    statement_operators_hd
+    return (statement_operators_hd,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    The shell provides a few operators designed to facilitate the generation of balance sheets and income statements. The particular methodology used to define these operations should be described in detail in the [“introduction to double-entry bookkeeping”](https://docs.google.com/document/d/100tGcA4blh6KSXPRGCZpUlyxaRUwFHEvnz_k9DyZFn4/edit?usp=sharing) document that accompanies Beancount and is mostly located in the source code in the [summarize](https://github.com/beancount/beancount/blob/master/beancount/ops/summarize.py) module.
+    These special operators are provided on the FROM clause that is made available on the various forms of query commands in the shell. These further transform the set of entries selected by the FROM expression at the transaction levels (not postings).
+    Please note that these are not from standard SQL; these are extensions provided by this shell language only.
+
+    For demonstrations let use use the following ledger (borrowed from the [summarize_test](https://github.com/beancount/beancount/blob/master/beancount/ops/summarize_test.py))
+    """)
+    return
+
+
+@app.cell
+def _(ledger_editor):
+    _ledger = """\
+    2012-01-01 open Income:Salary
+    2012-01-01 open Expenses:Taxes
+    2012-01-01 open Assets:US:Checking
+    2012-01-01 open Assets:CA:Checking
+
+    2012-03-01 * "Some income and expense to be summarized"
+        Income:Salary        10000 USD
+        Expenses:Taxes        3600 USD
+        Assets:US:Checking  -13600 USD
+
+    2012-03-02 * "Some conversion to be summarized"
+        Assets:US:Checking   -5000 USD @ 1.2 CAD
+        Assets:CA:Checking    6000 CAD
+
+    ;; 2012-06-01  BEGIN --------------------------------
+
+    2012-08-01 * "Some income and expense to show"
+        Income:Salary        11000 USD
+        Expenses:Taxes        3200 USD
+        Assets:US:Checking  -14200 USD
+
+    2012-08-02 * "Some other conversion to be summarized"
+        Assets:US:Checking   -3000 USD @ 1.25 CAD
+        Assets:CA:Checking    3750 CAD
+
+    ;; 2012-09-01  END   --------------------------------
+
+    2012-11-01 * "Some income and expense to be truncated"
+        Income:Salary        10000 USD
+        Expenses:Taxes        3600 USD
+        Assets:US:Checking  -13600 USD
+      """
+
+    ledger_ui_open_close = ledger_editor(_ledger, label="Ledger for Statement Operators demo:")
+    ledger_ui_open_close
+    return (ledger_ui_open_close,)
+
+
+@app.cell
+def _(heading, statement_operators_hd):
+    _= statement_operators_hd
+    openning_period_hd = heading(4, "Opening a Period", number=True)
+    openning_period_hd
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT date, flag, account, narration, position 
+    FROM OPEN ON 2012-08-01
+    """
+    sql_ui_open = query_editor(_sql, label="Pulling both transaction-level and posting-level meta together")
+    sql_ui_open
+    return (sql_ui_open,)
+
+
+@app.cell
+def _(ledger_ui_open_close, query_output, sql_ui_open):
+    query_output(ledger_ui_open_close.value, sql_ui_open.value)
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Test
+    """)
+    return
+
+
+@app.cell
+def _(ledger_editor):
+    _ledger = """\
+    2012-01-01 open Assets:Cash
+    2012-01-01 open Expenses:Food
+
+    2012-01-01 * "Shopping 1"
+      Expenses:Food   10 USD
+      Assets:Cash    -10 USD
+      """
+
+    ledger_ui_test = ledger_editor(_ledger, label="Ledger for test:")
+    ledger_ui_test
+    return (ledger_ui_test,)
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    PRINT FROM date > 1900-01-01
+    """
+    sql_ui_test = query_editor(_sql, label="Pulling both transaction-level and posting-level meta together")
+    sql_ui_test
+    return (sql_ui_test,)
+
+
+@app.cell
+def _(ledger_ui_test, query_output, sql_ui_test):
+    query_output(ledger_ui_test.value, sql_ui_test.value)
     return
 
 
