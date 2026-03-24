@@ -193,7 +193,8 @@ def _(heading, intro_hd):
 def _(mo):
     mo.md(r"""
     You can read the manual as a normal text document.
-    You can also change the default both ledger and query inputs.
+
+    The cool feature of this notebook though is that if you read the document as a marimo notebook, you can also change the default text both for ledger and query in all examples.
     As soon an input widget will lose focus, a query will be re-executed and output output will be updated
     """)
     return
@@ -400,7 +401,7 @@ def _(mo):
 @app.cell
 def _(heading, how_to_get_help_h):
     _ = how_to_get_help_h
-    making_hd=heading(2, "SELECT Queries", number=  True)
+    making_hd=heading(2, "Making Queries", number=  True)
     making_hd
     return (making_hd,)
 
@@ -408,7 +409,7 @@ def _(heading, how_to_get_help_h):
 @app.cell
 def _(heading, making_hd):
     _= making_hd
-    select_intro_hd=heading(3, "Introduction", number=  True)
+    select_intro_hd=heading(3, "Introduction. Available tables", number=  True)
     select_intro_hd
     return (select_intro_hd,)
 
@@ -446,14 +447,14 @@ def _(mo):
 def _(heading, select_intro_hd):
     _ = select_intro_hd
     caviats_hd = heading(4, "Caveats", number=True)
-    caviats_hd
+    # caviats_hd
     return (caviats_hd,)
 
 
 @app.cell
 def _(caviats_hd, heading):
     _ = caviats_hd
-    trad_vs_had_table_hd = heading(5, "Traditional vs #table syntax", number=True)
+    trad_vs_had_table_hd = heading(3, "Traditional vs #table syntax", number=True)
     trad_vs_had_table_hd
     return
 
@@ -475,8 +476,6 @@ def _(mo):
     ```
 
     Let us call is the traditional query form.
-
-    **Example:**
     """)
     return
 
@@ -581,7 +580,7 @@ def _(query_output, simple_ledger_ui, sql_ui_hash_table_accounts):
 @app.cell
 def _(caviats_hd, heading):
     _=caviats_hd
-    posting_vs_transaction_hd_fields = heading(5, "Posting fields vs transaction fields", number=True)
+    posting_vs_transaction_hd_fields = heading(3, "Posting fields vs transaction fields", number=True)
     posting_vs_transaction_hd_fields
     return (posting_vs_transaction_hd_fields,)
 
@@ -683,7 +682,7 @@ def _(mo):
 @app.cell
 def _(heading, posting_vs_transaction_hd_fields):
     _=posting_vs_transaction_hd_fields
-    jointing_posting_transaction_hd = heading(5, "Pre-jointed postings and related transactions", number=True)
+    jointing_posting_transaction_hd = heading(3, "Pre-jointed postings and related transactions", number=True)
     jointing_posting_transaction_hd
     return
 
@@ -767,7 +766,7 @@ def _(ledger_ui_with_meta, query_output, sql_ui_trans_meta):
 @app.cell
 def _(heading, posting_vs_transaction_hd_fields):
     _=posting_vs_transaction_hd_fields
-    select_q_conclusions_hd = heading(4, "Conclusions on using the SELECT Queries", number=True)
+    select_q_conclusions_hd = heading(3, "Conclusions on using the SELECT Queries", number=True)
     select_q_conclusions_hd
     return
 
@@ -779,7 +778,7 @@ def _(mo):
 
     * use traditional form of the beanquery query on postings
     * use the #table form for all other tables
-    * no particular need to use the **FROM** - clause filtering, as all the fields are also available for the **WHERE** clause
+    * no particular need to use the **FROM** - clause filtering in the SELECT query, as all the fields are also available for the **WHERE** clause
     """)
     return
 
@@ -787,7 +786,7 @@ def _(mo):
 @app.cell
 def _(heading, int_beanquery_hd):
     _=int_beanquery_hd
-    statement_operators_hd = heading(3, "Statement operators", number=True)
+    statement_operators_hd = heading(2, "Statement operators", number=True)
     statement_operators_hd
     return (statement_operators_hd,)
 
@@ -799,7 +798,7 @@ def _(mo):
     These special operators are provided on the FROM clause that is made available on the various forms of query commands in the shell. These further transform the set of entries selected by the FROM expression at the transaction levels (not postings).
     Please note that these are not from standard SQL; these are extensions provided by this shell language only.
 
-    For demonstrations let use use the following ledger (borrowed from the [summarize_test](https://github.com/beancount/beancount/blob/master/beancount/ops/summarize_test.py))
+    For demonstrations let use use the following ledger (borrowed with some changes from the [summarize_test](https://github.com/beancount/beancount/blob/master/beancount/ops/summarize_test.py))
     """)
     return
 
@@ -807,37 +806,43 @@ def _(mo):
 @app.cell
 def _(ledger_editor):
     _ledger = """\
-    2012-01-01 open Income:Salary
-    2012-01-01 open Expenses:Taxes
-    2012-01-01 open Assets:US:Checking
-    2012-01-01 open Assets:CA:Checking
+    2011-01-01 open Income:Salary
+    2011-01-01 open Expenses:Taxes
+    2011-01-01 open Expenses:Shopping
+    2011-01-01 open Liabilities:CreditCard
+    2011-01-01 open Assets:US:Checking
+    2011-01-01 open Assets:CA:Checking
 
-    2012-03-01 * "Some income and expense to be summarized"
-        Income:Salary        10000 USD
+    2011-03-01 * "Some income and expense to be summarized"
+        Income:Salary       -10000 USD
         Expenses:Taxes        3600 USD
-        Assets:US:Checking  -13600 USD
+        Assets:US:Checking    6400 USD
 
-    2012-03-02 * "Some conversion to be summarized"
+    2012-03-02 * "Some expenses and liabilities to be summarized"
+        Liabilities:CreditCard -200 USD
+        Expenses:Shopping       200 USD
+
+    2012-03-03 * "Some conversion to be summarized"
         Assets:US:Checking   -5000 USD @ 1.2 CAD
         Assets:CA:Checking    6000 CAD
 
     ;; 2012-06-01  BEGIN --------------------------------
 
     2012-08-01 * "Some income and expense to show"
-        Income:Salary        11000 USD
+        Income:Salary       -11000 USD
         Expenses:Taxes        3200 USD
-        Assets:US:Checking  -14200 USD
+        Assets:US:Checking    7800 USD
 
     2012-08-02 * "Some other conversion to be summarized"
         Assets:US:Checking   -3000 USD @ 1.25 CAD
         Assets:CA:Checking    3750 CAD
 
-    ;; 2012-09-01  END   --------------------------------
+    ;; 2013-01-01  END   --------------------------------
 
-    2012-11-01 * "Some income and expense to be truncated"
-        Income:Salary        10000 USD
+    2013-02-01 * "Some income and expense to be truncated"
+        Income:Salary       -10000 USD
         Expenses:Taxes        3600 USD
-        Assets:US:Checking  -13600 USD
+        Assets:US:Checking    6400 USD
       """
 
     ledger_ui_open_close = ledger_editor(_ledger, label="Ledger for Statement Operators demo:")
@@ -850,23 +855,390 @@ def _(heading, statement_operators_hd):
     _= statement_operators_hd
     openning_period_hd = heading(4, "Opening a Period", number=True)
     openning_period_hd
+    return (openning_period_hd,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Opening an exercise period at a particular date replaces all entries before that date by summarization entries that book the expected balance against an Equity “opening balances” account and implicitly clears the income and expenses to zero by transferring their balances to an Equity “previous earnings” account (see beancount.ops.summarize.open() for implementation details)
+    """)
     return
 
 
 @app.cell
 def _(query_editor):
     _sql = """\
-    SELECT date, flag, account, narration, position 
-    FROM OPEN ON 2012-08-01
+    PRINT FROM OPEN ON 2012-08-01
     """
-    sql_ui_open = query_editor(_sql, label="Pulling both transaction-level and posting-level meta together")
-    sql_ui_open
-    return (sql_ui_open,)
+    sql_ui_print_open = query_editor(_sql, label="Let us use PRINT statement to demonstrate how OPEN ON converts the ledger")
+    # sql_ui_print_open
+    return (sql_ui_print_open,)
 
 
 @app.cell
-def _(ledger_ui_open_close, query_output, sql_ui_open):
-    query_output(ledger_ui_open_close.value, sql_ui_open.value)
+def _(ledger_ui_open_close, mo, query_output, sql_ui_print_open):
+    mo.vstack(
+        [
+            sql_ui_print_open,
+            mo.md("On the left side you see the original ledger for reference and on the right side the ledger transformed by the OPEN ON statement"),
+            mo.hstack(
+                [ledger_ui_open_close,
+                query_output(ledger_ui_open_close.value, sql_ui_print_open.value)
+            ]
+        )
+    ])
+
+
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    To make it more demonstrative, let's compare balances of accounts on the date before 2012-08-01  without and with OPEN ON 2012-08-01 clause
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT 
+      account, sum(position) as acc_balance
+
+    WHERE 
+       date < 2012-08-01
+    GROUP BY account
+    ORDER BY account
+    """
+    sql_ui_no_open = query_editor(_sql, label="Without OPEN ON")
+    # sql_ui_no_open
+    return (sql_ui_no_open,)
+
+
+@app.cell
+def _():
+    # query_output(ledger_ui_open_close.value, sql_ui_no_open.value)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT 
+      account, sum(position) as acc_balance
+    FROM OPEN ON 2012-08-01
+    WHERE 
+       date < 2012-08-01
+    GROUP BY account
+    ORDER BY account
+    """
+    sql_ui_with_open = query_editor(_sql, label="With OPEN ON")
+    # sql_ui_with_open
+    return (sql_ui_with_open,)
+
+
+@app.cell
+def _():
+    # query_output(ledger_ui_open_close.value, sql_ui_with_open.value)
+    return
+
+
+@app.cell
+def _(
+    ledger_ui_open_close,
+    mo,
+    query_output,
+    sql_ui_no_open,
+    sql_ui_with_open,
+):
+    mo.hstack(
+        [
+            mo.vstack(
+                [
+                    sql_ui_no_open,
+                    query_output(ledger_ui_open_close.value, sql_ui_no_open.value)
+                ]
+            ),
+            mo.vstack(
+                [
+                    sql_ui_with_open,
+                    query_output(ledger_ui_open_close.value, sql_ui_with_open.value)
+                ]
+            )
+        ]
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    One can see, that balances on Assets and Liabilities did not change, but Income and Expenses were summarized in to the Equity:Earnings:Previous
+    """)
+    return
+
+
+@app.cell
+def _(heading, openning_period_hd):
+    _= openning_period_hd
+    closing_period_hd = heading(4, "Closing a Period", number=True)
+    closing_period_hd
+    return (closing_period_hd,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Closing an exercise period involves mainly truncating all entries that come after the given date and ensuring that currency conversions are correctly corrected for (see beancount.ops.summarize.close() for implementation details).
+
+    Note that the closing date should be one day after the last transaction you would like to include (this is in line with the convention we use everywhere in Beancount whereby starting dates are inclusive and ending dates exclusive).
+    The closing date is optional. If the date is not specified, the date one day beyond the date of the last entry is used.
+    Closing a period leaves the Income and Expenses accounts as they are, that is, their balances are not cleared to zero to Equity. This is because closing is also used to produce final balances for income statements. “Clearing”, as described in the next section, is only needed for balance sheets.
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    PRINT FROM CLOSE ON 2013-01-01
+    """
+    sql_ui_print_close = query_editor(_sql, label="Let us use PRINT statement to demonstrate how CLOSE ON converts the ledger")
+    return (sql_ui_print_close,)
+
+
+@app.cell
+def _(ledger_ui_open_close, mo, query_output, sql_ui_print_close):
+    mo.vstack(
+        [
+            sql_ui_print_close,
+            mo.md("On the left side you see the original ledger for reference and on the right side the ledger transformed by the CLOSE ON statement"),
+            mo.hstack(
+                [ledger_ui_open_close,
+                query_output(ledger_ui_open_close.value, sql_ui_print_close.value)
+            ]
+        )
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    **??** What is this   @ 0 NOTHING. Why is this needed?
+    Why is it not possible to put this like this
+
+    ```
+    2012-12-31 C "Conversion for (-8000 USD, 9750 CAD)"
+      Equity:Conversions:Current   8000 USD @@ 9750 CAD
+      Equity:Conversions:Current  -9750 CAD
+    ```
+    """)
+    return
+
+
+@app.cell
+def _(closing_period_hd, heading):
+    _= closing_period_hd
+    clearing_period_hd = heading(4, "Clearing Income & Expenses", number=True)
+    clearing_period_hd
+    return (clearing_period_hd,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    In order to produce a balance sheet, we need to transfer final balances of the Income and Expenses to an Equity “current earnings” account (sometimes called “retained earnings” or “net income”; you can select the specific account name to use using options in the input file). The resulting balances of income statement accounts should be zero (see beancount.ops.summarize.clear() for implementation details).
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    PRINT FROM CLEAR
+    """
+    sql_ui_clear = query_editor(_sql, label="Let us use PRINT statement to demonstrate how CLEAR converts the ledger")
+    return (sql_ui_clear,)
+
+
+@app.cell
+def _(ledger_ui_open_close, mo, query_output, sql_ui_clear):
+    mo.vstack(
+        [
+            sql_ui_clear,
+            mo.md("On the left side you see the original ledger for reference and on the right side the ledger transformed by the CLEAR statement"),
+            mo.hstack(
+                [ledger_ui_open_close,
+                query_output(ledger_ui_open_close.value, sql_ui_clear.value)
+            ]
+        )
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    To make it more demonstrative, let's compare balances of accounts without and with CLEAR clause
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT 
+      account, sum(position) as acc_balance
+    GROUP BY account
+    ORDER BY account
+    """
+    sql_ui_no_clear = query_editor(_sql, label="Without CLEAR")
+    return (sql_ui_no_clear,)
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT 
+      account, sum(position) as acc_balance
+    FROM CLEAR
+    GROUP BY account
+    ORDER BY account
+    """
+    sql_ui_with_clear = query_editor(_sql, label="With CLEAR")
+    return (sql_ui_with_clear,)
+
+
+@app.cell
+def _(
+    ledger_ui_open_close,
+    mo,
+    query_output,
+    sql_ui_no_clear,
+    sql_ui_with_clear,
+):
+    mo.hstack(
+        [
+            mo.vstack(
+                [
+                    sql_ui_no_clear,
+                    query_output(ledger_ui_open_close.value, sql_ui_no_clear.value)
+                ]
+            ),
+            mo.vstack(
+                [
+                    sql_ui_with_clear,
+                    query_output(ledger_ui_open_close.value, sql_ui_with_clear.value)
+                ]
+            )
+        ]
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Observe, that the `Equity:Earnings:Current` (by default) contains the net income accumulated during the preceding period. No balances for the Income nor Expenses accounts appear in the output.
+    """)
+    return
+
+
+@app.cell
+def _(clearing_period_hd, heading):
+    _= clearing_period_hd
+    open_close_clear_hd = heading(4, "Example Statements", number=True)
+    open_close_clear_hd
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    The statement operators of course may be combined. For instance, if you wanted to output data for an income statement for year 2012, you could issue the following statement:
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT account, sum(position) 
+    FROM OPEN ON 2012-01-01 CLOSE ON 2013-01-01
+    WHERE account ~ "Income|Expenses"
+    GROUP BY 1
+    ORDER BY 1
+    """
+    sql_ui_income_statement_open_close = query_editor(_sql, label="Income statement example using OPEN ON and CLOSE ON")
+    sql_ui_income_statement_open_close 
+
+    return (sql_ui_income_statement_open_close,)
+
+
+@app.cell
+def _(ledger_ui_open_close, query_output, sql_ui_income_statement_open_close):
+    query_output(ledger_ui_open_close.value, sql_ui_income_statement_open_close.value)
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    The same can be achieved by using more traditional WHERE filtering:
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT account, sum(position) 
+    WHERE 
+         date >= 2012-01-01 and date < 2013-01-01
+         AND account ~ "Income|Expenses"
+    GROUP BY 1
+    ORDER BY 1
+    """
+    sql_ui_income_statement_where_filter = query_editor(_sql, label="Income statement example using WHERE filter")
+    sql_ui_income_statement_where_filter
+    return
+
+
+@app.cell
+def _(ledger_ui_open_close, query_output, sql_ui_income_statement_open_close):
+    query_output(ledger_ui_open_close.value, sql_ui_income_statement_open_close.value)
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    To generate a balance sheet, you would add the CLEAR option and select the other accounts:
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT account, sum(position) 
+    FROM OPEN ON 2012-01-01 CLOSE ON 2013-01-01 CLEAR
+    WHERE not account ~ "Income|Expenses"
+    GROUP BY 1
+    ORDER BY 1;
+    """
+    sql_ui_bal_sheet = query_editor(_sql, label="Balance sheet example using OPEN ON, CLOSE ON, CLEAR")
+    sql_ui_bal_sheet 
+
+    return (sql_ui_bal_sheet,)
+
+
+@app.cell
+def _(ledger_ui_open_close, query_output, sql_ui_bal_sheet):
+    query_output(ledger_ui_open_close.value, sql_ui_bal_sheet.value)
     return
 
 
@@ -874,6 +1246,14 @@ def _(ledger_ui_open_close, query_output, sql_ui_open):
 def _(mo):
     mo.md(r"""
     ## Test
+    """)
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+ 
     """)
     return
 
