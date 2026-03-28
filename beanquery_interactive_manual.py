@@ -10,7 +10,7 @@
 import marimo
 
 __generated_with = "0.20.4"
-app = marimo.App(width="medium")
+app = marimo.App(width="medium", css_file="custom.css")
 
 
 @app.cell(hide_code=True)
@@ -22,14 +22,7 @@ def _(heading):
 
 @app.cell
 def _(mo):
-    mo.md("""
-    <style>
-    h1, h2, h3, h4, h5 {
-        margin-top: 0.1em;
-        margin-bottom: 0.1em;
-    }
-    </style>
-    """)
+    mo.md("")
     return
 
 
@@ -146,7 +139,7 @@ def _():
                 _heading_counters[i] = 0
             prefix = ".".join(str(_heading_counters[i]) for i in range(idx + 1)) + ". "
         return mo.md(
-            f"<h{level} style='color: {HEADING_COLOR}; margin-top: 0.1em !important; margin-bottom: 0.1em !important;'>"
+            f"<h{level} style='color: {HEADING_COLOR};'>"
             f"{prefix}{text}</h{level}>"
         )
 
