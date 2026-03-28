@@ -245,7 +245,7 @@ def _(mo):
 @app.cell
 def _(heading, how_to_install_h):
     _prev = how_to_install_h
-    how_to_start_h = heading(2, "How to run beanquery")
+    how_to_start_h = heading(2, "How to run beanquery CLI")
     how_to_start_h
     return (how_to_start_h,)
 
@@ -307,7 +307,7 @@ def _(mo):
     beanquery>
     ```
 
-    To get help on a specific command type .help `<command name>`
+    To get help on a specific command type `.help <command name>`
 
     E.g.:
 
@@ -400,18 +400,10 @@ def _(mo):
 
 @app.cell
 def _(heading, how_to_get_help_h):
-    _ = how_to_get_help_h
-    making_hd=heading(2, "Making Queries", number=  True)
-    making_hd
-    return (making_hd,)
-
-
-@app.cell
-def _(heading, making_hd):
-    _= making_hd
-    select_intro_hd=heading(3, "Introduction. Available tables", number=  True)
-    select_intro_hd
-    return (select_intro_hd,)
+    _= how_to_get_help_h
+    available_tables=heading(2, "Available tables", number=  True)
+    available_tables
+    return (available_tables,)
 
 
 @app.cell
@@ -444,51 +436,96 @@ def _(mo):
 
 
 @app.cell
-def _(heading, select_intro_hd):
-    _ = select_intro_hd
-    caviats_hd = heading(4, "Caveats", number=True)
-    # caviats_hd
-    return (caviats_hd,)
-
-
-@app.cell
-def _(caviats_hd, heading):
-    _ = caviats_hd
-    trad_vs_had_table_hd = heading(3, "Traditional vs #table syntax", number=True)
-    trad_vs_had_table_hd
-    return
+def _(available_tables, heading):
+    _=available_tables
+    types_of_queries_hd = heading(2, "Types of queries", number=True)
+    types_of_queries_hd
+    return (types_of_queries_hd,)
 
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    Originally **beanquery** was designed to be use to query postings table only. In this situation the **FROM** part of the SQL query was "hijacked" to be used for transaction-level filtering and **WHERE** was used for posting-level filtering, which introduced so-called  two-level filtering syntax
+    Beanquery supports the following type of queries
 
-    So, the SELECT query structure looked like this:
-
-    ```text
-    SELECT [DISTINCT] [<targets>|*]
-    [FROM <entry-filter-expression> [OPEN ON <date>] [CLOSE [ON <date>]] [CLEAR]]
-    [WHERE <posting-filter-expression>]
-    [GROUP BY <groups>]
-    [ORDER BY <groups> [ASC|DESC]]
-    [LIMIT num]
-    ```
-
-    Let us call is the traditional query form.
+    * SELECT
+    * BALANCES
+    * JOURNAL
+    * PRINT
     """)
     return
 
 
 @app.cell
+def _(heading, types_of_queries_hd):
+    _ = types_of_queries_hd
+    select_query_hd = heading(2, "SELECT Query", number=True)
+    select_query_hd
+    return (select_query_hd,)
+
+
+@app.cell
 def _(mo):
     mo.md(r"""
-    Later on, in beancount v3, beanquery was extended to query more tables (see above), in this situation the FROM part was needed again to select a table, so the new form of the SELECT query was introduced
+    The beanquery SELECT query loosely follows the standard SQL query with some deviations, which will be discussed throughout this manual
+
+    Originally **beanquery** was designed to be used to extract information on postings table only. In this situation the **FROM** part of the SQL query was "hijacked" to be used for transaction-level filtering and **WHERE** was used for posting-level filtering, which introduced so-called  two-level filtering syntax
+
+    So, the SELECT query structure looked like this (written in the the informal EBNF language):
+
+    ```text
+    SELECT [DISTINCT] [<targets>|*]
+    [FROM <entry-filter-logical-expression> [OPEN ON <date>] [CLOSE [ON <date>]] [CLEAR]]
+    [WHERE <posting-filter-logical-expression>]
+    [GROUP BY <groups>]
+    [ORDER BY <groups> [ASC|DESC]]
+    [LIMIT num]
+    ```
+
+    Let us call is the **traditional SELECT query form**.
+
+    /// details | **Note about the informal EBNF language**
+        type: info
+
+     In this manual, queries are described using a simplified notation that shows the structure of a command.
+
+    This notation is based on an **informal version of Extended Backus–Naur Form (EBNF)**, but you do not need to know anything about EBNF to use it. It is designed to be easy to read and understand.
+
+     Here is how to interpret it:
+
+    * Words written in **UPPERCASE** are keywords that must be typed exactly as shown
+    * Items in **square brackets `[ ... ]`** are optional
+    * The symbol `|` means “or” (choose one of the alternatives)
+    * Text inside **angle brackets `<...>`** is a placeholder — you replace it with your own value
+    * Items written next to each other should be written in that order
+
+    **Example:**
+
+     ```sql
+     SELECT [DISTINCT] <targets | * > [FROM <expression>]
+     ```
+
+    This means:
+
+     * Start with `SELECT`
+     * Optionally add `DISTINCT`
+     * Either provide one or more targets (what you want to select) or put asterisks (*)
+     * Then optionally put `FROM`, followed by some expression (expressions are discussed later)
+
+    **In simple terms:**
+
+    Think of this syntax as a **template** for writing queries:
+
+    It shows what parts are required, what parts are optional, and where you need to insert your own values.
+
+    ///
+
+    Later on, in beancount v3, when the beanquery was moved to be a standalone tool, it extended to query more tables (see above), in this situation the FROM part was needed again to select a table, so the new form of the SELECT query was introduced
 
     ```text
     SELECT [DISTINCT] [<targets>|*]
     [FROM #<table-name>]
-    [WHERE <posting-filter-expression>]
+    [WHERE <posting-filter-logical-expression>]
     [GROUP BY <groups>]
     [ORDER BY <groups> [ASC|DESC]]
     [LIMIT num]
@@ -499,7 +536,25 @@ def _(mo):
     * The **#table** form is activated by adding the # symbol in front of the table name
     * The **#table** form allows to query tables, different from postings table, but in case it is used to query postings table (which is possible), it lacks some functionality, available in the traditional form, namely the `[OPEN ON <date>] [CLOSE [ON <date>]] [CLEAR]` part. Later about this functinality later.
 
+
+    /// attention | Difference to SQL!
+
+    So, let emphasize
+
+    * In the traditional BQL the FROM clause is used to describe the posting-level filter, not describe the source of the data
+    * In the **#table** syntax the table name has to be preceded by the # symbol
+    * In the BQL using a wildcard as the target list (“*”) selects a good default list of columns, whilst the normal SQL the * is used to describe the complete set of columns, available in the table
+    ///
+
     At the moment beanquery supports both query types. Let us explore this on a simple ledger
+    """)
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+ 
     """)
     return
 
@@ -507,14 +562,15 @@ def _(mo):
 @app.cell
 def _(ledger_editor):
     _ledger = """\
-    2023-01-01 open Assets:Cash USD
-    2023-01-01 open Expenses:Food USD
+    2023-01-01 open Income:Salary
+    2023-01-01 open Assets:Cash 
+    2023-01-01 open Expenses:Food 
 
-    2023-01-01 * "Shopping 1"
-      Expenses:Food   10 USD
-      Assets:Cash    -10 USD
+    2023-01-01 * "Salary"
+      Income:Salary   -100 USD
+      Assets:Cash      100 USD
 
-    2023-01-02 * "Shopping 2"
+    2023-01-02 * "Shopping 1"
       Expenses:Food   20 USD
       Assets:Cash    -20 USD
       """
@@ -549,7 +605,7 @@ def _(query_editor):
     FROM #postings
     WHERE account = "Expenses:Food"
     """
-    sql_ui_hash_table = query_editor(_sql, label="The same \#table syntax query on postings")
+    sql_ui_hash_table = query_editor(_sql, label="The same query on postings, but using the \#table syntax")
     sql_ui_hash_table
     return (sql_ui_hash_table,)
 
@@ -563,10 +619,10 @@ def _(query_output, simple_ledger_ui, sql_ui_hash_table):
 @app.cell
 def _(query_editor):
     _sql = """\
-    SELECT account, open.date
+    SELECT account, open.date, close.date
     FROM #accounts
     """
-    sql_ui_hash_table_accounts = query_editor(_sql, label="\# table syntax query on accounts (only \#table style can be used for accounts table)")
+    sql_ui_hash_table_accounts = query_editor(_sql, label="\# table syntax query on accounts (only \#table style can be used for the accounts table)")
     sql_ui_hash_table_accounts
     return (sql_ui_hash_table_accounts,)
 
@@ -578,17 +634,25 @@ def _(query_output, simple_ledger_ui, sql_ui_hash_table_accounts):
 
 
 @app.cell
-def _(caviats_hd, heading):
-    _=caviats_hd
-    posting_vs_transaction_hd_fields = heading(3, "Posting fields vs transaction fields", number=True)
-    posting_vs_transaction_hd_fields
-    return (posting_vs_transaction_hd_fields,)
+def _(heading, select_query_hd):
+    _=select_query_hd
+    notable_tables_hd = heading(2, "Notable tables", number=True)
+    notable_tables_hd
+    return (notable_tables_hd,)
+
+
+@app.cell
+def _(heading, notable_tables_hd):
+    _=notable_tables_hd
+    post_trans_relations_hd = heading(4, "Relations and available fields", number=True)
+    post_trans_relations_hd
+    return
 
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    The structure of transactions and entries can be explained by the following simplified diagram:
+    The relation between transactions and postings can be explained by the following simplified diagram:
     """)
     return
 
@@ -604,7 +668,7 @@ def _(mo):
     mo.md(r"""
     The contents of a ledger is parsed into a list of directives, most of which are “Transaction” objects which contain two or more “Posting” objects. Postings are always linked only to a single transaction (they are never shared between transactions). Each posting refers to its parent transaction but has a unique account name, amount and associated lot (possibly with a cost), a price and some other attributes. The parent transaction itself contains a few useful attributes as well, such as a date, the name of a payee, a narration string, a flag, links, tags, etc.
 
-    So, one can think, that such attribute as **date** or **narration** belong to transaction object, whilst attributes like **account** belongs to posting object. However (at least in the latest version of beanquery) all of the transaction-level fields are also made avaiable in the posting objects (the only exeption being the transaction meta, which is not available from the posting). One can check this by comparing the outputs of the **`.describe postings`** and **`.describe transactions`** commands.
+    So, one can think, that such attribute as **date** or **narration** belong to transaction object, whilst attributes like **account** belongs to posting object. However (probably for simplicity) all of the transaction-level fields are also made avaiable in the posting objects (the only exeption being the transaction meta, which is not available from the posting). One can check this by comparing the outputs of the **`.describe postings`** and **`.describe transactions`** commands.
 
     So, from the beanquery data model the diagram looks more like this
     """)
@@ -680,9 +744,9 @@ def _(mo):
 
 
 @app.cell
-def _(heading, posting_vs_transaction_hd_fields):
-    _=posting_vs_transaction_hd_fields
-    jointing_posting_transaction_hd = heading(3, "Pre-jointed postings and related transactions", number=True)
+def _(heading, notable_tables_hd):
+    _=notable_tables_hd
+    jointing_posting_transaction_hd = heading(4, "Hard coded joints between postings and transactions", number=True)
     jointing_posting_transaction_hd
     return
 
@@ -764,9 +828,9 @@ def _(ledger_ui_with_meta, query_output, sql_ui_trans_meta):
 
 
 @app.cell
-def _(heading, posting_vs_transaction_hd_fields):
-    _=posting_vs_transaction_hd_fields
-    select_q_conclusions_hd = heading(3, "Conclusions on using the SELECT Queries", number=True)
+def _(heading, notable_tables_hd):
+    _=notable_tables_hd
+    select_q_conclusions_hd = heading(3, "Conclusions on using the SELECT Query", number=True)
     select_q_conclusions_hd
     return
 
@@ -786,7 +850,7 @@ def _(mo):
 @app.cell
 def _(heading, int_beanquery_hd):
     _=int_beanquery_hd
-    statement_operators_hd = heading(2, "Statement operators", number=True)
+    statement_operators_hd = heading(3, "Statement operators (OPEN ON, CLOSE ON, CLEAR)", number=True)
     statement_operators_hd
     return (statement_operators_hd,)
 
@@ -853,7 +917,7 @@ def _(ledger_editor):
 @app.cell
 def _(heading, statement_operators_hd):
     _= statement_operators_hd
-    openning_period_hd = heading(4, "Opening a Period", number=True)
+    openning_period_hd = heading(4, "Opening a Period (OPEN ON clause)", number=True)
     openning_period_hd
     return (openning_period_hd,)
 
@@ -888,8 +952,6 @@ def _(ledger_ui_open_close, mo, query_output, sql_ui_print_open):
             ]
         )
     ])
-
-
     return
 
 
@@ -983,7 +1045,7 @@ def _(mo):
 @app.cell
 def _(heading, openning_period_hd):
     _= openning_period_hd
-    closing_period_hd = heading(4, "Closing a Period", number=True)
+    closing_period_hd = heading(4, "Closing a Period (CLOSE ON clause)", number=True)
     closing_period_hd
     return (closing_period_hd,)
 
@@ -1042,7 +1104,7 @@ def _(mo):
 @app.cell
 def _(closing_period_hd, heading):
     _= closing_period_hd
-    clearing_period_hd = heading(4, "Clearing Income & Expenses", number=True)
+    clearing_period_hd = heading(4, "Clearing Income & Expenses (CLEAR clause)", number=True)
     clearing_period_hd
     return (clearing_period_hd,)
 
@@ -1174,7 +1236,6 @@ def _(query_editor):
     """
     sql_ui_income_statement_open_close = query_editor(_sql, label="Income statement example using OPEN ON and CLOSE ON")
     sql_ui_income_statement_open_close 
-
     return (sql_ui_income_statement_open_close,)
 
 
@@ -1232,13 +1293,36 @@ def _(query_editor):
     """
     sql_ui_bal_sheet = query_editor(_sql, label="Balance sheet example using OPEN ON, CLOSE ON, CLEAR")
     sql_ui_bal_sheet 
-
     return (sql_ui_bal_sheet,)
 
 
 @app.cell
 def _(ledger_ui_open_close, query_output, sql_ui_bal_sheet):
     query_output(ledger_ui_open_close.value, sql_ui_bal_sheet.value)
+    return
+
+
+@app.cell
+def _(heading, select_query_hd):
+    _ = select_query_hd
+    high_level_shortcuts_hd = heading(2, "High-level shortcuts (JOURNAL, BALANCE, PRINT)", number=True)
+    high_level_shortcuts_hd
+    return (high_level_shortcuts_hd,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    There are two types of queries that are very common for accounting applications: journals and balances reports. While we have explicit implementations of such reports that can be produced using the bean-report tool, we are also able to synthesize good approximations of such reports using SELECT statements. This section describes a few additional selection commands that translate directly into SELECT statements and which are then run with the same query code. These are intended as convenient shortcuts.
+    """)
+    return
+
+
+@app.cell
+def _(heading, high_level_shortcuts_hd):
+    _=high_level_shortcuts_hd
+    journal_hd = heading(3, "Selecting Journals (JOURNAL query)", number=True)
+    journal_hd
     return
 
 
@@ -1267,6 +1351,14 @@ def _(ledger_editor):
     2012-01-01 * "Shopping 1"
       Expenses:Food   10 USD
       Assets:Cash    -10 USD
+
+    2012-01-02 * "Shopping 2"
+      Expenses:Food   20 USD
+      Assets:Cash    -20 USD
+
+    2012-01-02 * "Shopping 3"
+      Expenses:Food   30 USD
+      Assets:Cash    -30 USD
       """
 
     ledger_ui_test = ledger_editor(_ledger, label="Ledger for test:")
@@ -1277,7 +1369,7 @@ def _(ledger_editor):
 @app.cell
 def _(query_editor):
     _sql = """\
-    PRINT FROM date > 1900-01-01
+    JOURNAL 
     """
     sql_ui_test = query_editor(_sql, label="Pulling both transaction-level and posting-level meta together")
     sql_ui_test
