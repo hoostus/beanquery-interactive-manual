@@ -208,7 +208,7 @@ def _(mo):
 
     E.g.: ?? Why do we need this.
 
-    As well as some to-does, marked with #TODO.
+    As well as some TODOs, marked with #TODO.
 
     E.g.: _#TODO: we need to investigate this_
     """)
@@ -226,14 +226,8 @@ def _(heading, how_to_use__man_h):
 @app.cell
 def _(mo):
     mo.md(r"""
-    Beanquery parses a Beancount ledger and creates an in-memory database represented in a form of several tables. Beanquery then exposes a command-line tool that acts like a client to that in-memory database in which you can type queries in a variant of SQL. You invoke it like this:
+    Beanquery parses a Beancount ledger and creates an in-memory database represented in a form of several tables. Beanquery then exposes a command-line tool that acts like a client to that in-memory database in which you can type queries in a variant of SQL.
 
-    ```shell
-    bean-query  test.bean
-    Input file: "Beancount"
-    Ready with 3 directives (2 postings in 1 transactions, 0 validation errors)
-    beanquery>
-    ```
     Beanquery started as an experiment in beancount v2, but in v3 (when **bean-report** and **bean-web** have been discontinued) became practically the only tool to query information out of beancount ledger. Thus one can say, that in v3 beancount has moved towards the [Self-service business intelligence](https://www.techtarget.com/searchbusinessanalytics/definition/self-service-business-intelligence-BI) model instead of providing off the shelf ready to use reports.
 
     So one might ask: Why create another SQL client? Why not output the data to an SQLite database and allow the user to use that SQL client? Apparently this experiment was conducted by creating the [bean-sql](https://github.com/beancount/beancount/blob/v2/beancount/scripts/sql.py). It appears, that writing queries was painful and carrying out operations on lots that are held at cost was difficult.
@@ -541,7 +535,7 @@ def _(mo):
 
     ///
 
-    Later on, in beancount v3, when the beanquery was moved to be a standalone tool, it extended to query more tables (see above), in this situation the FROM part was needed again to select a table, so the new form of the SELECT query was introduced
+    Later on, in beancount v3, when the beanquery was moved to be a standalone tool, it was extended to query more tables (see above), in this situation the FROM part was needed again to select a table, so the new form of the SELECT query was introduced
 
     ```text
     SELECT [DISTINCT] [<targets>|*]
@@ -693,7 +687,7 @@ def _(heading, select_query_hd):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    When we talked about SQL query we mentioned, but not defined the notion of an expression. Let correct this.
+    When we talked about SQL query we mentioned, but not defined the notion of an expression. Let us correct this.
 
     An **expression** is something, which can be evaluated to a value.
 
@@ -726,6 +720,8 @@ def _(mo):
 
     Binquery  also provides a regular expression search operator into a string object:
     * ~ (search regexp)
+
+    The below example demonstrates few of these operators
     """)
     return
 
@@ -947,7 +943,7 @@ def _(heading, more_on_tables):
 @app.cell
 def _(mo):
     mo.md(r"""
-    As it was already mentioned, the beanquery was originally created to work with the postings table only, therefore the postings table has some notable features
+    As it was already mentioned, the beanquery was originally created to work with the postings table only, therefore the postings table has some notable and sometimes unexpected features
     """)
     return
 
@@ -1186,7 +1182,7 @@ def _(heading, more_on_tables):
 @app.cell
 def _(mo):
     mo.md(r"""
-    The `other_accounts` column is another notable column in the postings table. It contains the set of accounts from other postings in the transaction, the posting in question belongs to.
+    The `other_accounts` column is another notable column in the postings table. It contains the set of accounts from other postings in the same transaction.
 
     Example:
     """)
@@ -1388,15 +1384,6 @@ def _(heading, postings_table_hd):
     return
 
 
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    One common desired output is a journal of entries over time (also called a “register” in Ledger).
-    For this type of report, it is convenient to also render a column of the cumulative balance of the selected postings rows. Access to the previous row is not a standard SQL feature, so we get a little creative and provide a special column called “balance” which is automatically calculated based on the previous selected row.
-    """)
-    return
-
-
 @app.cell
 def _(heading, other_accounts_column_hd):
     _=other_accounts_column_hd
@@ -1411,7 +1398,7 @@ def _(mo):
     A special column exists that identifies each transaction uniquely: “id”. It is a unique hash automatically computed from the transaction and should be stable between runs.
     This hash is derived from the contents of the transaction object itself (if you change something about the transaction, e.g. you edit the narration, the id will change).
 
-    Evn though the `id` field belongs to the transaction, it is not available in the `transactions` table. The only way to find it is to look in postings via traditional query.
+    Note: even though the `id` field logically belongs to the transaction, it is not available in the `transactions` table. The only way to find it is to look in postings via traditional query.
     """)
     return
 
