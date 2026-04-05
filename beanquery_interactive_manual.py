@@ -2086,16 +2086,6 @@ def _(ledger_ui_journal, query_output, sql_ui_journal):
     return
 
 
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ?? Is there anything we can query with JOURNAL, which we cannot query with SELECT ... WHERE ?
-
-    E.g.:
-    """)
-    return
-
-
 @app.cell
 def _(query_editor):
     _sql = """\
@@ -2259,6 +2249,14 @@ def _(query_editor):
 @app.cell
 def _(ledger_ui_journal, query_output, sql_ui_print):
     query_output(ledger_ui_journal.value, sql_ui_print.value)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Note, that unlike any other type of query commands, the `PRINT` does not produce a tabular data, but just a text output.
+    """)
     return
 
 
