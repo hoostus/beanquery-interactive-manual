@@ -211,19 +211,14 @@ def _(heading, intro_hd):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    The document assumes no prior knowledge of the SQL language and is structured as much as possible in the form of a tutorial, where each chapter builds on the material covered in the previous ones. As a downside, the material is more scattered throughout the document than it would otherwise be.
+    The document assumes no prior knowledge of the SQL language and is structured as much as possible in the form of a tutorial, where each chapter builds on the material covered in the previous ones. As a downside, the material is more scattered throughout the document than it would otherwise be if an SQL-familiar reader would be assumed. E.g. the available tables are introduces in one chapter and then some more detailed information about some of the tables is added in several chapters afterwards.
 
-    For someone already familiar with SQL, it may make sense to search for special notes that highlight differences from classical SQL, wherever applicable, rather than to read the entire document:
+    This document is written in the [marimo](https://docs.marimo.io/) notebook. You can read the manual as a normal html document.
+    However the cool feature of this notebook is that if you run it as a marimo notebook, you can interact with the document by changing the default text for both the ledger and the query in all examples. As soon as an input widget loses focus, the query will be re-executed and the output will be updated.
 
-    /// attention | Difference to SQL!
-    * Some difference is explained here
-    ///
+    Both in the HTML format as well as in the marimo notebook format the clickable table of content is available if one hovers the mouse near the right browser vertical scroll bar.
 
-    You can read the manual as a normal text document.
-
-    The cool feature of this notebook is that if you read it as a marimo notebook, you can interact with the document by changing the default text for both the ledger and the query in all examples. As soon as an input widget loses focus, the query will be re-executed and the output will be updated.
-
-    Note that throughout the document some unresolved questions are marked with double question marks.
+    Note that throughout the document some unresolved questions the author had about the beanquery functionality are marked with double question marks.
 
     E.g.: ?? Why do we need this.
 
@@ -252,11 +247,10 @@ def _(mo):
     So one might ask: Why create another SQL client? Why not output the data to an SQLite database and allow the user to use that SQL client? Apparently this experiment was conducted by creating the [bean-sql](https://github.com/beancount/beancount/blob/v2/beancount/scripts/sql.py). It appears, that writing queries was painful and carrying out operations on lots that are held at cost was difficult.
 
     Therefore beanquery has some extras that are essential for querying a Beancount ledger. These extras include (but are not necessarily limited to) the following:
-    * It allows filtering at two levels simultaneously: you can filter whole transactions, which has the benefit of respecting the accounting equation, and then, usually for presentation purposes, you can also filter at the postings level.
-    * Objects in one table already have a reference to related objects in another table. E.g. records in the postings table have a reference to the related object from the transactions table. So one can say that these tables have already been pre-joined (even though technically this is not correct).
     * The client supports the semantics of inventory booking implemented in Beancount. It also supports aggregation functions on inventory objects and rendering functions (e.g., COST() to render the cost of an inventory instead of its contents).
     * The client supports some functions, which run on postings, but in a background access other tables (e.g. CONVERT() function, which formally operates on the amount, position or inventory, but in a background uses the prices table as well).
-    * The client allows you to flatten multiple lots into separate postings to produce lists of holdings each with their associated cost basis.  _**??** Need to put some examples here_
+    * It allows filtering at two levels simultaneously: you can filter whole transactions, which has the benefit of respecting the accounting equation, and then, usually for presentation purposes, you can also filter at the postings level.
+    * Objects in one table already have a reference to related objects in another table. E.g. records in the postings table have a reference to the related object from the transactions table. So one can say that these tables have already been pre-joined (even though technically this is not correct).
     * Transactions can be summarized in a manner useful to produce balance sheets and income statements. For example, our SQL variant explicitly supports a “close” operation with an effect similar to closing the year, which inserts transactions to clear income statement accounts to equity and removes past history.
     """)
     return
@@ -294,7 +288,7 @@ def _(mo):
     To run beanquery type
 
     ```shell
-    beanquery [OPTIONS] FILENAME [QUERY]...
+    bean-query [OPTIONS] FILENAME [QUERY]...
     ```
 
     **Result:** beanquery will load ledger and start the beanquery client
@@ -570,13 +564,10 @@ def _(mo):
     * The **#table** form is activated by adding the # symbol in front of the table name
     * The **#table** form allows querying tables other than the postings table, but when it is used to query the postings table (which is possible), it lacks some functionality available in the traditional form, namely the `[OPEN ON <date>] [CLOSE [ON <date>]] [CLEAR]` part. (This may actually be a [bug](https://github.com/beancount/beanquery/issues/274), rather than a feature).
 
-
-    /// attention | Difference to SQL!
     So, let us emphasize:
     * In the traditional BQL the FROM clause is used to describe the posting-level filter, not to describe the source of the data
     * In the **#table** syntax the table name has to be preceded by the # symbol
     * In the BQL using a wildcard as the target list (“*”) selects a good default list of columns, whilst the normal SQL the * is used to describe the complete set of columns, available in the table
-    ///
 
     At the moment beanquery supports both query types. Let us explore this on a simple ledger
     """)
@@ -663,9 +654,7 @@ def _(mo):
     mo.md(r"""
     Note, that here we use the wildcard symbol (*) to list some columns, instead of specifying column names manually.
 
-    /// attention | Difference to SQL!
-    * In the BQL using a wildcard as the target list (“*”) selects a good default list of columns, whilst the normal SQL the * is used to describe the complete set of columns, available in the table
-    ///
+    Difference to SQL: the BQL using a wildcard as the target list (“*”) selects a good default list of columns, whilst the traditional SQL the * is used to describe the complete set of columns, available in the table
     """)
     return
 
@@ -1490,7 +1479,7 @@ def _(ledger_id_ui, query_output, sql_ui_id_print):
 @app.cell
 def _(heading, more_on_tables):
     _=more_on_tables
-    select_q_conclusions_hd = heading(3, "Preliminary conclusions on using the SELECT Query", number=True)
+    select_q_conclusions_hd = heading(3, "Practical conclusions on using the SELECT Query", number=True)
     select_q_conclusions_hd
     return
 
@@ -1503,6 +1492,8 @@ def _(mo):
     * use traditional form of the beanquery query on postings
     * use the #table form for all other tables
     * no particular need to use the **FROM** - clause filtering in the SELECT query, as all the fields are also available for the **WHERE** clause
+
+    ?? Are my conclusions correct?
     """)
     return
 
@@ -1973,29 +1964,9 @@ def _(heading, select_query_hd):
 @app.cell
 def _(mo):
     mo.md(r"""
-    There are two types of queries that are very common for accounting applications: journals and balances reports. While we have explicit implementations of such reports that can be produced using the bean-report tool, we are also able to synthesize good approximations of such reports using SELECT statements. This section describes a few additional selection commands that translate directly into SELECT statements and which are then run with the same query code. These are intended as convenient shortcuts.
-    """)
-    return
+    There are two types of queries that are very common for accounting applications: journals and balances reports. This section describes a few additional selection commands that translate directly into SELECT statements and which are then run with the same query code. These are intended as convenient shortcuts.  ?? It looks like the equivalent SELECT statements are more flexible (see more below).
 
-
-@app.cell
-def _(heading, high_level_shortcuts_hd):
-    _=high_level_shortcuts_hd
-    journal_hd = heading(3, "Selecting Journals (JOURNAL query)", number=True)
-    journal_hd
-    return (journal_hd,)
-
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    A common type of query is one that generates a linear journal of entries (Ledger calls this a “register”). This roughly corresponds to an account statement, but with our language, such a statement can be generated for any subset of postings.
-    You can generate a journal with the following syntax:
-
-    `JOURNAL <account-regexp> [AT <function>] [FROM …]`
-
-    The regular expression account-regexp is used to select which subset of accounts to generate a journal for. The optional `AT <function>` clause is used to specify an aggregation function for the amounts rendered (typically `UNITS` or `COST`). The `FROM` clause follows the same rules as for the `SELECT` statement and is optional.
-    Here is an example journal-generating query:
+    In this section we will be using the following ledger for all the examples:
     """)
     return
 
@@ -2029,6 +2000,28 @@ def _(ledger_editor):
     ledger_ui_journal = ledger_editor(_ledger, label="Ledger for JOURNAL test")
     ledger_ui_journal
     return (ledger_ui_journal,)
+
+
+@app.cell
+def _(heading, high_level_shortcuts_hd):
+    _=high_level_shortcuts_hd
+    journal_hd = heading(3, "Selecting Journals (JOURNAL query)", number=True)
+    journal_hd
+    return (journal_hd,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    A common type of query is one that generates a linear journal of entries (Ledger calls this a “register”). This roughly corresponds to an account statement, but with our language, such a statement can be generated for any subset of postings.
+    You can generate a journal with the following syntax:
+
+    `JOURNAL <account-regexp> [AT <function>] [FROM …]`
+
+    The regular expression account-regexp is used to select which subset of accounts to generate a journal for. The optional `AT <function>` clause is used to specify an aggregation function for the amounts rendered (typically `UNITS` or `COST`). The `FROM` clause follows the same rules as for the `SELECT` statement and is optional.
+    Here is an example journal-generating query:
+    """)
+    return
 
 
 @app.cell
