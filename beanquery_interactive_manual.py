@@ -1970,15 +1970,13 @@ def _(heading, high_level_shortcuts_hd):
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## Test
-    """)
-    return
+    A common type of query is one that generates a linear journal of entries (Ledger calls this a “register”). This roughly corresponds to an account statement, but with our language, such a statement can be generated for any subset of postings.
+    You can generate a journal with the following syntax:
 
+    `JOURNAL <account-regexp> [AT <function>] [FROM …]`
 
-@app.cell
-def _(mo):
-    mo.md(r"""
- 
+    The regular expression account-regexp is used to select which subset of accounts to generate a journal for. The optional `AT <function>` clause is used to specify an aggregation function for the amounts rendered (typically `UNITS` or `COST`). The `FROM` clause follows the same rules as for the `SELECT` statement and is optional.
+    Here is an example journal-generating query:
     """)
     return
 
@@ -1986,40 +1984,98 @@ def _(mo):
 @app.cell
 def _(ledger_editor):
     _ledger = """\
-    2012-01-01 open Assets:Cash
-    2012-01-01 open Expenses:Food
+    2023-01-01 open Income:Salary
+    2023-01-01 open Assets:Bank-A
+    2023-01-01 open Assets:Bank-B
+    2023-01-01 open Expenses:Misc 
 
-    2012-01-01 * "Shopping 1"
-      Expenses:Food   10 USD
-      Assets:Cash    -10 USD
+    2023-01-01 * "Salary"
+      Income:Salary   -1000 USD
+      Assets:Bank-A    750 USD
+      Assets:Bank-B    250 USD
 
-    2012-01-02 * "Shopping 2"
-      Expenses:Food   20 USD
-      Assets:Cash    -20 USD
+    2023-01-02 * "Shopping using Bank-A"
+      Expenses:Misc    100 USD
+      Assets:Bank-A   -100 USD
 
-    2012-01-02 * "Shopping 3"
-      Expenses:Food   30 USD
-      Assets:Cash    -30 USD
+    2023-01-03 * "Shopping using Bank-B"
+      Expenses:Misc    110 USD
+      Assets:Bank-B   -110 USD
+
+    2023-01-04 * "Shopping using Bank-A again"
+      Expenses:Misc    120 USD
+      Assets:Bank-A   -120 USD
       """
 
-    ledger_ui_test = ledger_editor(_ledger, label="Ledger for test:")
-    ledger_ui_test
-    return (ledger_ui_test,)
+    ledger_ui_journal = ledger_editor(_ledger, label="Ledger for JOURNAL test")
+    ledger_ui_journal
+    return (ledger_ui_journal,)
 
 
 @app.cell
 def _(query_editor):
     _sql = """\
-    JOURNAL 
+    JOURNAL "Assets:Bank-A"
     """
-    sql_ui_test = query_editor(_sql, label="Pulling both transaction-level and posting-level meta together")
-    sql_ui_test
-    return (sql_ui_test,)
+    sql_ui_journal = query_editor(_sql, label="JOURNAL query")
+    sql_ui_journal
+    return (sql_ui_journal,)
 
 
 @app.cell
-def _(ledger_ui_test, query_output, sql_ui_test):
-    query_output(ledger_ui_test.value, sql_ui_test.value)
+def _(ledger_ui_journal, query_output, sql_ui_journal):
+    query_output(ledger_ui_journal.value, sql_ui_journal.value)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ?? Is there anything we can query with JOURNAL, which we cannot query with SELECT ... WHERE ?
+
+    E.g.:
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT date, narration, account, position, balance
+    WHERE account ~ "Assets:Bank-A"
+    """
+    sql_ui_journal_balance = query_editor(_sql, label="Equivalent to JOURNAL SELECT ... WHERE query")
+    sql_ui_journal_balance
+    return (sql_ui_journal_balance,)
+
+
+@app.cell
+def _(ledger_ui_journal, query_output, sql_ui_journal_balance):
+    query_output(ledger_ui_journal.value, sql_ui_journal_balance.value)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### Selecting Balances
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ##
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### Print
+    """)
     return
 
 
