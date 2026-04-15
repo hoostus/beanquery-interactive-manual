@@ -21,10 +21,21 @@ def _(heading):
     return (title_hd,)
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    import tomllib
+    from pathlib import Path
+    _pyproject_path = Path(__file__).parent / "pyproject.toml"
+    with open(_pyproject_path, "rb") as _f:
+        _version = tomllib.load(_f)["project"]["version"]
+    mo.md(f"*Version: {_version}*")
+    return
+
+
 @app.cell
 def _(mo):
     mo.md("""
- 
+
     """)
     return
 
