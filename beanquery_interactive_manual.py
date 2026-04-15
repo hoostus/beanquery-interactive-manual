@@ -1793,32 +1793,35 @@ def _(mo):
 
 @app.cell
 def _(heading, notable_functions_hd):
-    units_costs_func_hd = heading(4, "UNITS() and COST() functions", notable_functions_hd, number=True)
-    units_costs_func_hd
-    return (units_costs_func_hd,)
+    sum_function_hd = heading(4, "SUM()", notable_functions_hd, number=True)
+    sum_function_hd
+    return (sum_function_hd,)
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
+    The `SUM()` function is probably the most widely used aggregate function in beanquery.
+
+    ```text
+    sum(amount)
+      Calculate the sum of the amount. The result is an Inventory.
+
+    sum(inventory)
+      Calculate the sum of the inventories. The result is an Inventory.
+
+    sum(decimal)
+    sum(int)
+      Calculate the sum of the numerical argument.
+
+    sum(position)
+      Calculate the sum of the position. The result is an Inventory.
     ```
-    cost(position)
-      Get the cost of a position.
+    The usage of the `SUM()` function for a simple case is already demonstrated in the **Aggregate Functions** section.
 
-    cost(inventory)
-      Get the cost of an inventory.
+    Let us apply the `sum()` function to the more complex ledger with lots, tracked at cost and to different commodities.
 
-
-    units(position)
-      Get the number of units of a position (stripping cost).
-
-    units(inventory)
-      Get the number of units of an inventory (stripping cost).
-    ```
-
-    Let us see results of these functions on a simple ledger.
-
-    Note: for illustrative purposes on the right sit the same ledger is printed using the PRINT query command to show the full internal representation of the lot cost (with the cost date and the cost label)
+    Note: for illustrative purposes on the right sit the same ledger is printed using the PRINT query command to show the full internal representation of the lot cost (with the cost date and the cost label. E.g. 1 IVV {10 USD, **2023-01-11}**`)
     """)
     return
 
@@ -1864,75 +1867,15 @@ def _(ledger_editor):
 
     """
 
-    units_costs_ledger_ui = ledger_editor(_ledger, label="UNITS and COST example ledger")
-    return (units_costs_ledger_ui,)
+    sum_with_costs_ledger_ui = ledger_editor(_ledger, label="Ledger for SUM() function demo at costs")
+    return (sum_with_costs_ledger_ui,)
 
 
 @app.cell
-def _(mo, query_output, units_costs_ledger_ui):
+def _(mo, query_output, sum_with_costs_ledger_ui):
     # units_costs_ledger_ui
-    mo.hstack([units_costs_ledger_ui,
-              query_output(units_costs_ledger_ui.value, "PRINT")])
-    return
-
-
-@app.cell
-def _(query_editor):
-    _sql = """\
-    SELECT date, narration, account, position, cost(position), units(position)
-    WHERE narration ~ "Invest"
-    """
-    units_costs_query_ui = query_editor(_sql, label="UNITS and COST query")
-    units_costs_query_ui
-    return (units_costs_query_ui,)
-
-
-@app.cell
-def _(query_output, units_costs_ledger_ui, units_costs_query_ui):
-    query_output(units_costs_ledger_ui.value, units_costs_query_ui.value)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    Observe that:
-
-    * the `cost()` function always returns some result, even in case the position is not "held at cost".  In case there is no cost, the cost function returns units.
-    * the `cost()` function only reruns a cost amount (decimal number and commodity), without the cost date and label
-
-    Both the `cost()` and `units()` functions can operate on positions as well as on inventories. That means, that one can apply these functions either to columns or to the output of the `sum()` function in the aggregate query. See the `SUM()` function section to see how these functions work on inventory.
-    """)
-    return
-
-
-@app.cell
-def _(heading, units_costs_func_hd):
-    sum_function_hd = heading(4, "The `SUM()` function", units_costs_func_hd, number=True)
-    sum_function_hd
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ```text
-    sum(amount)
-      Calculate the sum of the amount. The result is an Inventory.
-
-    sum(inventory)
-      Calculate the sum of the inventories. The result is an Inventory.
-
-    sum(decimal)
-    sum(int)
-      Calculate the sum of the numerical argument.
-
-    sum(position)
-      Calculate the sum of the position. The result is an Inventory.
-    ```
-
-    Let us apply the `sum()` function to the investment account of same ledger, as was used to demonstrate the `cost()` and `units()` function.
-    """)
+    mo.hstack([sum_with_costs_ledger_ui,
+              query_output(sum_with_costs_ledger_ui.value, "PRINT")])
     return
 
 
@@ -1949,8 +1892,8 @@ def _(query_editor):
 
 
 @app.cell
-def _(query_output, units_costs_agg_query_ui, units_costs_ledger_ui):
-    query_output(units_costs_ledger_ui.value, units_costs_agg_query_ui.value)
+def _(query_output, sum_with_costs_ledger_ui, units_costs_agg_query_ui):
+    query_output(sum_with_costs_ledger_ui.value, units_costs_agg_query_ui.value)
     return
 
 
@@ -1960,18 +1903,132 @@ def _(mo):
     Observe that:
 
     * the sum of positions is an inventory<br>
-      note, that the way resulting inventory (the sum of positions) is displayed is a bit confusing, as the cost date cost and label are not displayed.
-      The more correct representation would be (see [this](https://groups.google.com/g/beancount/c/jdNCyhyq3Ug) discussion):
+      note, that the way resulting inventory (the sum of positions) is displayed in beanquery may be is a bit confusing, as the cost date cost and label are not displayed (see [this](https://groups.google.com/g/beancount/c/jdNCyhyq3Ug) discussion).
+      The more complete representation would be :
 
     ```text
-                                            sum(position)
-    ------------------------------------------------------------------------------------------------------------------------------------------------------
-    10 IPP   1000 IVV   100 IVV {20 USD, 2023-01-13}   40 IVV {20 USD, 2023-01-12, "lot-label"}   30 IVV {20 USD, 2023-01-12}   1 IVV {10 USD, 2023-01-11}
+                sum(position)
+    -------------------------------------------
+    10   IPP
+    1000 IVV
+    100  IVV {20 USD, 2023-01-13}
+    40   IVV {20 USD, 2023-01-12, "lot-label"}
+    30   IVV {20 USD, 2023-01-12}
+    1    IVV {10 USD, 2023-01-11}
     ```
 
     * the `sum()` function joins different lots together, following the rules, which beancount uses to build inventories (see more in the document [How Inventories Work](https://docs.google.com/document/d/11a9bIoNuxpSOth3fmfuIFzlZtpTJbvw-bPaQCnezQJs)):
        * different commodities are not summed together (`10 IPP` and `1000 IVV` are not added together).
-       * even when commodities are the same, lots are added together only when all elements of the cost are also the same: the same commodity, the same date, the same label (if available). E.g. in the above example only the following 2 lots are added together:<br> `10 IVV {20 USD, 2023-01-12} + 20 IVV {20 USD, 2023-01-12} = 30 IVV {20 USD, 2023-01-12}`
+       * even when commodities are the same, lots are added together only when all elements of the cost are also the same: the same cost commodity, the same cost date, the same cost label (if available). E.g. in the above example only the following 2 lots are added together:<br> `10 IVV {20 USD, 2023-01-12} + 20 IVV {20 USD, 2023-01-12} = 30 IVV {20 USD, 2023-01-12}`
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+ 
+    """)
+    return
+
+
+@app.cell
+def _(heading, sum_function_hd):
+    units_costs_func_hd = heading(4, "UNITS(), COST()", sum_function_hd, number=True)
+    units_costs_func_hd
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ```
+    cost(position)
+      Get the cost of a position.
+
+    cost(inventory)
+      Get the cost of an inventory.
+
+
+    units(position)
+      Get the number of units of a position (stripping cost).
+
+    units(inventory)
+      Get the number of units of an inventory (stripping cost).
+    ```
+
+    Let us see results of these functions on the same ledger, which was used to demonstrate the `SUM()` function.
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT date, narration, account, position, cost(position), units(position)
+    WHERE narration ~ "Invest"
+    """
+    units_costs_query_ui = query_editor(_sql, label="UNITS and COST query")
+    units_costs_query_ui
+    return (units_costs_query_ui,)
+
+
+@app.cell
+def _(query_output, sum_with_costs_ledger_ui, units_costs_query_ui):
+    query_output(sum_with_costs_ledger_ui.value, units_costs_query_ui.value)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Observe that:
+
+    * the `cost()` function always returns some result, even in case the position is not "held at cost".  In case there is no cost, the cost function returns units.
+    * the `cost()` function only returns a cost amount (decimal number and commodity), without the cost date and label
+
+    Both the `cost()` and `units()` functions can operate on positions as well as on inventories. That means, that one can apply these functions either to columns or to the output of the `sum()` function in the aggregate query.  Let us demonstrate this on the same ledger, which was used for the `SUM()` function demo:
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT cost(sum(position)), sum(cost(position)), units(sum(position)),  sum(units(position))
+    WHERE account = "Assets:Investment"
+    """
+    sum_cost_agg_query_ui = query_editor(_sql, label="COST() and UNITS() of inventories")
+    sum_cost_agg_query_ui
+    return (sum_cost_agg_query_ui,)
+
+
+@app.cell
+def _(query_output, sum_cost_agg_query_ui, sum_with_costs_ledger_ui):
+    query_output(sum_with_costs_ledger_ui.value, sum_cost_agg_query_ui.value)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Observe, that:
+    * `cost(sum(position))` produces the same result as the `sum(cost(position))`. In another words, the `cost()` function, does some internal summing. when applied to an inventory. The same is applicable to the `units()`.
+    """)
+    return
+
+
+@app.cell
+def _(heading, sum_function_hd):
+    convert_func_hd = heading(4, "CONVERT()", sum_function_hd, number=True)
+    convert_func_hd
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    _#TODO: add some info_
     """)
     return
 
@@ -2754,6 +2811,86 @@ def _(mo):
     mo.md(r"""
     Note, that unlike any other type of query commands, the `PRINT` does not produce a tabular data, but just a text output.
     """)
+    return
+
+
+@app.cell
+def _(heading, high_level_shortcuts_hd):
+    beanquery_with_dataframe_hd = heading(2, "Usage of beanquery with Data Frame", high_level_shortcuts_hd, number=True)
+    beanquery_with_dataframe_hd
+    return (beanquery_with_dataframe_hd,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    _#TODO: add information_
+    """)
+    return
+
+
+@app.cell
+def _(beanquery_with_dataframe_hd, heading):
+    working_around_limitations_hd = heading(2, "Working around beanquery limitations", beanquery_with_dataframe_hd, number=True)
+    working_around_limitations_hd
+    return (working_around_limitations_hd,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    This section will discuss of the beanquery limitations and how to work around them
+
+    _#TODO: add information_
+
+    ### No PIVOT functionality
+
+    * Use dataframes
+
+    ### No table joining
+
+    * Use built in functions
+    * Use data frames
+    """)
+    return
+
+
+@app.cell
+def _(heading, working_around_limitations_hd):
+    queries_for_typical_situations_hd = heading(2, "Example queries for typical situations", working_around_limitations_hd, number=True)
+    queries_for_typical_situations_hd
+    return (queries_for_typical_situations_hd,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    This section collects example of queries to be used in different practical situations
+
+    _#TODO: don't by shy to add lost of examples_
+    """)
+    return
+
+
+@app.cell
+def _(heading, queries_for_typical_situations_hd):
+    net_worth_multy_commodity_hd = heading(3, "Net worth with multiple commodity types", queries_for_typical_situations_hd, number=True)
+    net_worth_multy_commodity_hd
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    _#TODO: add examples_
+    """)
+    return
+
+
+@app.cell
+def _(heading, queries_for_typical_situations_hd):
+    P_and_l_mult_commodities_hd = heading(3, "P&L like report in multi-commodities ledger", queries_for_typical_situations_hd, number=True)
+    P_and_l_mult_commodities_hd
     return
 
 
