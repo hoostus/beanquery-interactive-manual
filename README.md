@@ -11,7 +11,8 @@ It was created with the following goals in mind:
 * to be self-documenting: all query outputs are computed by running beanquery as part of the notebook execution
 * to be interactive: when run as a [marimo](https://marimo.io/) notebook, readers can experiment by changing the default ledgers and/or queries, with outputs updating automatically
 
-**Current state**: work is ongoing
+**Current state**: work is ongoing. 
+Comments, feedback and PRs are more then welcome!
 
 ## How to open the manual
 
