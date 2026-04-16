@@ -2050,6 +2050,21 @@ def _(mo):
 
 
 @app.cell
+def _(heading, sum_function_hd):
+    root_function_hd = heading(4, "ROOT()", sum_function_hd, number=True)
+    root_function_hd
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    _#TODO: add some info_
+    """)
+    return
+
+
+@app.cell
 def _(functions_hd, heading):
     controlling_results_hd = heading(2, "Controlling query results", functions_hd, number=True)
     controlling_results_hd
@@ -2883,14 +2898,14 @@ def _(mo):
     mo.md(r"""
     This section collects example of queries to be used in different practical situations
 
-    _#TODO: don't by shy to add lost of examples_
+    _#TODO: don't by shy to add lots  of examples_
     """)
     return
 
 
 @app.cell
 def _(heading, queries_for_typical_situations_hd):
-    net_worth_multy_commodity_hd = heading(3, "Net worth with multiple commodity types", queries_for_typical_situations_hd, number=True)
+    net_worth_multy_commodity_hd = heading(3, "Net Worth and P&L-like reports in multi-commodities ledger", queries_for_typical_situations_hd, number=True)
     net_worth_multy_commodity_hd
     return
 
@@ -2898,22 +2913,170 @@ def _(heading, queries_for_typical_situations_hd):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    _#TODO: add examples_
+    One of the typical situations is when some (or all) of Income and  Expenses are done in one currency, but reporting has to be done in another currency. Throughout the accounting period one currency fluctuates against another currency.
+
+    E.g.: let us look at the situation when Income and Expenses are in one currency (TUG), but reporting has to be done in USD. Throughout the accounting period the value of TUG drops from 1 USD to 0.25 USD.
     """)
     return
 
 
 @app.cell
-def _(heading, queries_for_typical_situations_hd):
-    P_and_l_mult_commodities_hd = heading(3, "P&L like report in multi-commodities ledger", queries_for_typical_situations_hd, number=True)
-    P_and_l_mult_commodities_hd
+def _(ledger_editor):
+    _ledger = """\
+    2023-01-01 open Assets:Bank-A 
+    2023-01-01 open Income:Salary
+    2023-01-01 open Expenses:Misc
+
+    ; January
+    2023-01-01 price USD 1 TUG
+
+    2023-01-01 * "Salary January 2023"
+      Assets:Bank-A  2000 TUG
+      Income:Salary -2000 TUG
+
+    2023-01-02 * "Expenses January 2023"
+      Assets:Bank-A  -1000 TUG
+      Expenses:Misc   1000 TUG
+
+    ; June
+    2023-06-01 price USD 2 TUG    ; <= big inflation of TUG vs USD
+
+    2023-06-01 * "Salary June 2023"
+      Assets:Bank-A  2000 TUG
+      Income:Salary -2000 TUG
+
+    2023-06-02 * "Expenses June 2023"
+      Assets:Bank-A  -1000 TUG
+      Expenses:Misc   1000 TUG
+
+    ; October
+    2023-10-01 price USD 4 TUG    ; <= big inflation of TUG vs USD again
+
+    2023-10-01 * "Salary October 2023"
+      Assets:Bank-A  2000 TUG
+      Income:Salary -2000 TUG
+
+    2023-10-02 * "Expenses October 2023"
+      Assets:Bank-A  -1000 TUG
+      Expenses:Misc   1000 TUG
+    """
+
+    ledger_ui_multi_commodity = ledger_editor(_ledger, label="Multi-commodity ledger")
+    ledger_ui_multi_commodity
+    return (ledger_ui_multi_commodity,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Note that, following accepted accounting practices, **Assets** and **Liabilities** are translated into the reporting currency using the exchange rate in effect on the date of the **Net Worth report**. For instance, to determine the current value of your bitcoins, you need to know only your current bitcoin holdings and the current bitcoin price, not the various exchange rates at which you bought them in the past.
+
+    So, broken by accounts the Net-Worth-like report for Y2023 could look like this (for illustration purpose let us also add a column in the original currency):
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT 
+          root(account,1) as account_short, convert(sum(position), "USD", 2023-12-13) as value_conv, sum(position) as value_orig
+    WHERE 
+           date <= 2023-12-31 AND date >= 2023-01-01 AND account ~ "Assets|Liabilities"
+    """
+    sql_ui_net_worth_multi_commodity = query_editor(_sql, label="Multi commodity Net Worth query")
+    sql_ui_net_worth_multi_commodity
+    return (sql_ui_net_worth_multi_commodity,)
+
+
+@app.cell
+def _(
+    ledger_ui_multi_commodity,
+    query_output,
+    sql_ui_net_worth_multi_commodity,
+):
+    query_output(ledger_ui_multi_commodity.value, sql_ui_net_worth_multi_commodity.value)
     return
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    _#TODO: add examples_
+    For P&L -like report, inline with accepted accounting practices  **Income**, **Expenses**, and **Liabilities** are translated into the reporting currency using the exchange rate in effect on the transaction date (in contrast to the Net Worth report, which uses the exchange rate on the report date).
+    Thus, for example, if you purchased an item for 60 Turkish lira while on vacation in Turkey when 60 lira equaled 2 USD, it will remain 2 USD in the P&L report, regardless of subsequent exchange rate fluctuations.
+
+    So, the P&L -like report could look like this (for illustration purpose let us also add a column in the original currency):
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT 
+          root(account,1) as account_short, 
+          sum(convert(position, "USD", date)) as value_conv, 
+          sum(position) as value_orig
+    WHERE 
+           date <= 2023-12-31 
+           AND date >= 2023-01-01 
+           AND account ~ "Income|Expenses"
+    """
+    sql_ui_Pand_L_multi_commodity_per_account = query_editor(_sql, label="Multi commodity P&L query by account")
+    # sql_ui_Pand_L_multi_commodity_per_account
+    return (sql_ui_Pand_L_multi_commodity_per_account,)
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT 
+           sum(convert(position, "USD", date)) as value_conv, 
+           sum(position) as value_orig
+    WHERE 
+           date <= 2023-12-31 
+           AND date >= 2023-01-01 
+           AND account ~ "Income|Expenses"
+    """
+    sql_ui_Pand_L_multi_commodity_total = query_editor(_sql, label="Multi commodity P&L query total")
+    # sql_ui_Pand_L_multi_commodity_total
+    return (sql_ui_Pand_L_multi_commodity_total,)
+
+
+@app.cell
+def _():
+    # query_output(ledger_ui_multi_commodity.value, sql_ui_Pand_L_multi_commodity_per_account.value)
+    return
+
+
+@app.cell
+def _(
+    ledger_ui_multi_commodity,
+    mo,
+    query_output,
+    sql_ui_Pand_L_multi_commodity_per_account,
+    sql_ui_Pand_L_multi_commodity_total,
+):
+    mo.hstack([
+        mo.vstack([
+            sql_ui_Pand_L_multi_commodity_per_account,
+            query_output(ledger_ui_multi_commodity.value, sql_ui_Pand_L_multi_commodity_per_account.value)
+        ]),
+        mo.vstack([
+            sql_ui_Pand_L_multi_commodity_total,
+            query_output(ledger_ui_multi_commodity.value, sql_ui_Pand_L_multi_commodity_total.value)
+        ])
+    ])
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Observe, that in this case the P&L report (1750 USD) does not explain the change in the Net Worth in Y2023 (0 USD => 750 USD). However the P&L in TUG (3000 TUG) does explain the change in the Net Worth (3000 TUG).
+
+    This is expected and is happening, because the value of TUG was constantly dropping throughout the year against USD.
+    To be able to do the Net Worth reconciliation in the reporting currency (USD in this case) one has to take into account unrealized gains / losses due exchange rate changes (e.g. using the [sing_curr_conv](https://github.com/Ev2geny/evbeantools/blob/main/docs/sing_curr_conv.md) tool).
     """)
     return
 
