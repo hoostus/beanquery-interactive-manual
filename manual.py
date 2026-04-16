@@ -35,7 +35,7 @@ def _(mo):
 @app.cell
 def _(mo):
     mo.md("""
-
+ 
     """)
     return
 
@@ -644,7 +644,6 @@ def _(mo):
     So, to summarize:
     * In the traditional BQL, the FROM clause is used to describe the posting-level filter, not to identify the data source
     * In the **#table** syntax, the table name must be preceded by the # symbol
-    * In BQL, using a wildcard as the target list (“*”) selects a sensible default set of columns, whereas in standard SQL, * selects the complete set of columns available in the table
 
     Currently beanquery supports both query types. Let us explore this with a simple ledger.
     """)
@@ -731,7 +730,7 @@ def _(mo):
     mo.md(r"""
     Note, that here we use the wildcard symbol (*) to list some columns, instead of specifying column names manually.
 
-    Difference to SQL: the BQL using a wildcard as the target list (“*”) selects a good default list of columns, whilst the traditional SQL the * is used to describe the complete set of columns, available in the table
+    Difference to SQL: the BQL using a wildcard as the target list (“*”) selects a good default list of columns, whilst the traditional SQL the * is used to describe the complete set of columns, available in the table.
     """)
     return
 
@@ -739,7 +738,7 @@ def _(mo):
 @app.cell
 def _(mo):
     mo.md(r"""
-    Let us query the **accounts** table
+    Let us now query the **accounts** table. Note, that for the **accounts** table we have no choice, but to use the **#table** query format.
     """)
     return
 
@@ -750,7 +749,7 @@ def _(query_editor):
     SELECT account, open.date, close.date
     FROM #accounts
     """
-    sql_ui_hash_table_accounts = query_editor(_sql, label=r"\# table syntax query on accounts (only \#table style can be used for the accounts table)")
+    sql_ui_hash_table_accounts = query_editor(_sql, label=r"Querying on accounts (only \#table style can be used for the accounts table)")
     sql_ui_hash_table_accounts
     return (sql_ui_hash_table_accounts,)
 
@@ -803,6 +802,8 @@ def _(mo):
 
     Beanquery also provides a regular expression search operator on string objects:
     * ~ (search regexp)
+
+    ?? Which not-logical operators are supported? E.g. I found, that the '+' operator also works. E.g.: `SELECT "a"+"b"`
 
     The example below demonstrates a few of these operators
     """)
@@ -991,8 +992,9 @@ def _(mo):
       accounts (set[str])
     beanquery>
     ```
+    ?? Why is that
 
-    _\#TODO: investigate this and raise an issue, if applicable_
+    _#TODO: investigate this and raise an issue, if applicable_
     """)
     return
 
@@ -1090,7 +1092,7 @@ def _(ledger_editor):
       """
 
     ledger_ui_post_vs_tr = ledger_editor(_ledger, label="Simple ledger:")
-    # ledger_ui_post_vs_tr
+    ledger_ui_post_vs_tr
     return (ledger_ui_post_vs_tr,)
 
 
