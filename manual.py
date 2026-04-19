@@ -324,6 +324,10 @@ def _(mo):
     ```
 
     All the interactive commands are supported.
+
+
+    **Shell variables**
+    The interactive shell has a few “set” variables that you can customize to change some of the behavior of the shell. These are like environment variables. Refer to **Appendix A for more information.**
     """)
     return
 
@@ -331,39 +335,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 5 Shell variables
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    The interactive shell has a few “set” variables that you can customize to change some of the behavior of the shell. These are like environment variables. Type the `.set` command to see the list of available variables and their current value.
-
-    The variables are:
-
-    * boxed (boolean): Whether we should draw a box around the output table.
-    * expand (boolean): If true, expand columns that render to lists on multiple rows.
-    * format (string): The output format. Supported formats: “text”, "csv".
-    * narrow (boolean): Whether the column header names are truncated to fit within the display width.
-    * nullvalue: '' ?? what does it do?
-    * numberify: (boolean): If set to `true` splits columns that contain monetary types (Amount, Position, Inventory) into separate plain-number columns — one per currency found in that column.
-    * pager (string): The name of the pager program to pipe multi-page output to when the output is larger than the screen. The initial value is copied from the PAGER environment variable.
-    * spaced (boolean): Whether to insert an empty line between every result row. This is only relevant because postings with multiple lots may require multiple lines to be rendered, and inserting an empty line helps delineate those as separate.
-    * unicode: (boolean): ?? what does it do?
-
-    To change a variable from its default value, type `.set <variable-name> <new-value>`. E.g.:
-
-    `.set numberify true`
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## 6 How to get help
+    ## 5 How to get help
     """)
     return
 
@@ -482,7 +454,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 7 Available tables. Introduction
+    ## 6 Available tables. Introduction
     """)
     return
 
@@ -517,7 +489,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 8 Types of queries
+    ## 7 Types of queries
     """)
     return
 
@@ -538,7 +510,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 9 SELECT Query
+    ## 8 SELECT Query
     """)
     return
 
@@ -737,7 +709,7 @@ def _(query_output, simple_ledger_ui, sql_ui_hash_table_accounts):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 10 Expressions
+    ## 9 Expressions
     """)
     return
 
@@ -759,7 +731,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 10.1 Operators
+    ### 9.1 Operators
     """)
     return
 
@@ -836,7 +808,7 @@ def _(operators_ledger_ui, query_output, sql_ui_operators):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 10.2 Constants
+    ### 9.2 Constants
     """)
     return
 
@@ -900,7 +872,7 @@ def _(query_output, simple_ledger_constants_ui, sql_ui_constants):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 10.3 Columns and Functions in expressions
+    ### 9.3 Columns and Functions in expressions
     """)
     return
 
@@ -980,7 +952,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 11 More on tables
+    ## 10 More on tables
     """)
     return
 
@@ -996,7 +968,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 11.1 The postings table
+    ### 10.1 The postings table
     """)
     return
 
@@ -1012,7 +984,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 11.1.1 Transactions columns in the postings table
+    #### 10.1.1 Transactions columns in the postings table
     """)
     return
 
@@ -1151,7 +1123,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 11.1.2 The `entry` column
+    #### 10.1.2 The `entry` column
     """)
     return
 
@@ -1235,7 +1207,7 @@ def _(ledger_ui_with_meta, query_output, sql_ui_trans_meta):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 11.1.3 The `other_accounts` column
+    #### 10.1.3 The `other_accounts` column
     """)
     return
 
@@ -1322,7 +1294,7 @@ def _(other_accounts_ledger_ui, query_output, sql_ui_other_accounts_cash):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 11.1.4 The `balance` column
+    #### 10.1.4 The `balance` column
     """)
     return
 
@@ -1440,7 +1412,7 @@ def _(
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 11.1.5 The `weight` column
+    #### 10.1.5 The `weight` column
     """)
     return
 
@@ -1458,7 +1430,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 11.2 Transactions table
+    ### 10.2 Transactions table
     """)
     return
 
@@ -1466,7 +1438,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 11.2.1 The `id` column
+    #### 10.2.1 The `id` column
     """)
     return
 
@@ -1550,7 +1522,7 @@ def _(ledger_id_ui, query_output, sql_ui_id_print):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 12 Practical conclusions on using the SELECT Query
+    ## 11 Practical conclusions on using the SELECT Query
     """)
     return
 
@@ -1572,7 +1544,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 13 Functions
+    ## 12 Functions
     """)
     return
 
@@ -1631,7 +1603,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 13.1 Aggregate functions and Aggregate Queries
+    ### 12.1 Aggregate functions and Aggregate Queries
     """)
     return
 
@@ -1785,7 +1757,7 @@ def _(agg_ledger_ui, agg_query_without_groupby_ui, query_output):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 13.2 Notable functions
+    ### 12.2 Notable functions
     """)
     return
 
@@ -1801,7 +1773,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 13.2.1 SUM()
+    #### 12.2.1 SUM()
     """)
     return
 
@@ -1943,7 +1915,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 13.2.2 UNITS(), COST()
+    #### 12.2.2 UNITS(), COST()
     """)
     return
 
@@ -2030,7 +2002,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 13.2.3 CONVERT()
+    #### 12.2.3 CONVERT()
     """)
     return
 
@@ -2046,7 +2018,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 13.2.4 ROOT()
+    #### 12.2.4 ROOT()
     """)
     return
 
@@ -2062,7 +2034,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 14 Controlling query results
+    ## 13 Controlling query results
     """)
     return
 
@@ -2070,7 +2042,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 14.1 DISTINCT
+    ### 13.1 DISTINCT
     """)
     return
 
@@ -2088,7 +2060,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 14.2 ORDER BY
+    ### 13.2 ORDER BY
     """)
     return
 
@@ -2118,7 +2090,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 14.3 LIMIT
+    ### 13.3 LIMIT
     """)
     return
 
@@ -2140,7 +2112,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 15 Statement operators (OPEN ON, CLOSE ON, CLEAR)
+    ## 14 Statement operators (OPEN ON, CLOSE ON, CLEAR)
     """)
     return
 
@@ -2207,7 +2179,7 @@ def _(ledger_editor):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 15.0.1 Opening a Period (OPEN ON clause)
+    #### 14.0.1 Opening a Period (OPEN ON clause)
     """)
     return
 
@@ -2335,7 +2307,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 15.0.2 Closing a Period (CLOSE ON clause)
+    #### 14.0.2 Closing a Period (CLOSE ON clause)
     """)
     return
 
@@ -2394,7 +2366,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 15.0.3 Clearing Income & Expenses (CLEAR clause)
+    #### 14.0.3 Clearing Income & Expenses (CLEAR clause)
     """)
     return
 
@@ -2502,7 +2474,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### 15.0.4 Example Statements
+    #### 14.0.4 Example Statements
     """)
     return
 
@@ -2595,7 +2567,7 @@ def _(ledger_ui_open_close, query_output, sql_ui_bal_sheet):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 16 High-level shortcuts (JOURNAL, BALANCE, PRINT)
+    ## 15 High-level shortcuts (JOURNAL, BALANCE, PRINT)
     """)
     return
 
@@ -2644,7 +2616,7 @@ def _(ledger_editor):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 16.1 Selecting Journals (JOURNAL query)
+    ### 15.1 Selecting Journals (JOURNAL query)
     """)
     return
 
@@ -2699,7 +2671,7 @@ def _(ledger_ui_journal, query_output, sql_ui_journal_balance):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 16.2 Selecting Balances (BALANCES query)
+    ### 15.2 Selecting Balances (BALANCES query)
     """)
     return
 
@@ -2807,7 +2779,7 @@ def _(ledger_ui_journal, query_output, sql_ui_balances_where_per_account):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 16.3 Print (PRINT query)
+    ### 15.3 Print (PRINT query)
     """)
     return
 
@@ -2856,7 +2828,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 17 Usage of beanquery with Data Frame
+    ## 16 Usage of beanquery with Data Frame
     """)
     return
 
@@ -2872,7 +2844,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 18 Working around beanquery limitations
+    ## 17 Working around beanquery limitations
     """)
     return
 
@@ -2899,7 +2871,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 19 Example queries for typical situations
+    ## 18 Example queries for typical situations
     """)
     return
 
@@ -2917,7 +2889,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### 19.1 Net Worth and P&L-like reports in multi-commodities ledger
+    ### 18.1 Net Worth and P&L-like reports in multi-commodities ledger
     """)
     return
 
@@ -3089,6 +3061,46 @@ def _(mo):
 
     This is expected and is happening, because the value of TUG was constantly dropping throughout the year against USD.
     To be able to do the Net Worth reconciliation in the reporting currency (USD in this case) one has to take into account unrealized gains / losses due exchange rate changes (e.g. using the [sing_curr_conv](https://github.com/Ev2geny/evbeantools/blob/main/docs/sing_curr_conv.md) tool).
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 19 Appendixes
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 19.1 Appendix A. Shell variables.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    The interactive shell has a few “set” variables that you can customize to change some of the behavior of the shell. These are like environment variables. Type the `.set` command to see the list of available variables and their current value.
+
+    The variables are:
+
+    * boxed (boolean): Whether we should draw a box around the output table.
+    * expand (boolean): If true, expand columns that render to lists on multiple rows.
+    * format (string): The output format. Supported formats: “text”, "csv".
+    * narrow (boolean): Whether the column header names are truncated to fit within the display width.
+    * nullvalue: '' ?? what does it do?
+    * numberify: (boolean): If set to `true` splits columns that contain monetary types (Amount, Position, Inventory) into separate plain-number columns — one per currency found in that column.
+    * pager (string): The name of the pager program to pipe multi-page output to when the output is larger than the screen. The initial value is copied from the PAGER environment variable.
+    * spaced (boolean): Whether to insert an empty line between every result row. This is only relevant because postings with multiple lots may require multiple lines to be rendered, and inserting an empty line helps delineate those as separate.
+    * unicode: (boolean): ?? what does it do?
+
+    To change a variable from its default value, type `.set <variable-name> <new-value>`. E.g.:
+
+    `.set numberify true`
     """)
     return
 
