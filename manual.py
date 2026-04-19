@@ -15,10 +15,11 @@ app = marimo.App(width="medium", css_file="custom.css")
 
 
 @app.cell(hide_code=True)
-def _(heading):
-    title_hd = heading(1, "Interactive beanquery manual", number=False)
-    title_hd
-    return (title_hd,)
+def _(mo):
+    mo.md(r"""
+    # Interactive beanquery manual
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -154,59 +155,23 @@ def _():
         ui = mo.ui.code_editor(default_text, language="sql", label=label, show_copy_button=True, min_height=1, debounce=True)
         return ui
 
-
-    class Heading:
-        """A rendered heading with its hierarchical number, used to chain headings in sequence."""
-        def __init__(self, html: mo.Html, number: list):
-            # pass
-            self._html = html
-            self.number = number
-
-        def _mime_(self):
-            return self._html._mime_()
-
-    def heading(level: int, text: str, prev_heading: Heading | None = None, number: bool = True) -> Heading:
-        """Render a colored markdown heading with optional hierarchical numbering.
-
-        Numbering is derived from prev_heading.number, enabling correct ordering
-        regardless of marimo cell execution order.
-
-        Args:
-            level: Heading level 1-5. Level 1 is reserved for the document title.
-            text: Heading text.
-            prev_heading: The Heading returned by the preceding heading (not necessarily the immediately preceeding heading)
-                          E.g. in the situiation of 1, 1.1, 1.2, 2, the prev_heading for "2" could be either "1" or "1.2" 
-                          call in document order. Pass None for the first heading.
-            number: If False, no number is generated (e.g. for the document title).
-        """
-        num = []
-        prefix = ""
-        if number and 2 <= level <= 5:
-            idx = level - 2  # 0=h2, 1=h3, 2=h4, 3=h5
-            prev_num = prev_heading.number if prev_heading is not None else []
-            parent = prev_num[:idx]
-            own = (prev_num[idx] + 1) if len(prev_num) > idx else 1
-            num = parent + [own]
-            prefix = ".".join(str(n) for n in num) + ". "
-        html = mo.md(f"{'#' * level} {prefix}{text}")
-        return Heading(html, num)
-
-
-    return heading, ledger_editor, mo, query_editor, query_output
+    return ledger_editor, mo, query_editor, query_output
 
 
 @app.cell(hide_code=True)
-def _(heading, title_hd):
-    intro_hd = heading(2, "Introduction to this document", title_hd, number=True)
-    intro_hd
-    return (intro_hd,)
+def _(mo):
+    mo.md(r"""
+    ## 1 Introduction to this document
+    """)
+    return
 
 
-@app.cell
-def _(heading, intro_hd):
-    purpose_hd = heading(3, "Purpose and scope", intro_hd, number=True)
-    purpose_hd
-    return (purpose_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 1.1 Purpose and scope
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -229,10 +194,11 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(heading, purpose_hd):
-    how_to_use__man_h = heading(3, "How to use this manual", purpose_hd)
-    how_to_use__man_h
-    return (how_to_use__man_h,)
+def _(mo):
+    mo.md(r"""
+    ### 1.2 How to use this manual
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -256,11 +222,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, how_to_use__man_h):
-    int_beanquery_hd = heading(2, "Introduction to beanquery", how_to_use__man_h, number=True)
-    int_beanquery_hd
-    return (int_beanquery_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 2 Introduction to beanquery
+    """)
+    return
 
 
 @app.cell
@@ -283,10 +250,11 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(heading, int_beanquery_hd):
-    how_to_install_h = heading(2, "How to install beanquery", int_beanquery_hd)
-    how_to_install_h
-    return (how_to_install_h,)
+def _(mo):
+    mo.md(r"""
+    ## 3 How to install beanquery
+    """)
+    return
 
 
 @app.cell
@@ -299,11 +267,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, how_to_install_h):
-    how_to_run_hd = heading(2, "How to run beanquery CLI", how_to_install_h)
-    how_to_run_hd
-    return (how_to_run_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 4 How to run beanquery CLI
+    """)
+    return
 
 
 @app.cell
@@ -359,10 +328,11 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, how_to_run_hd):
-    shell_variables_hd = heading(2, "Shell variables", how_to_run_hd, number=True)
-    shell_variables_hd
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 5 Shell variables
+    """)
     return
 
 
@@ -390,11 +360,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, how_to_run_hd):
-    how_to_get_help_h = heading(2, "How to get help", how_to_run_hd)
-    how_to_get_help_h
-    return (how_to_get_help_h,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 6 How to get help
+    """)
+    return
 
 
 @app.cell
@@ -508,11 +479,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, how_to_get_help_h):
-    available_tables = heading(2, "Available tables. Introduction", how_to_get_help_h, number=True)
-    available_tables
-    return (available_tables,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 7 Available tables. Introduction
+    """)
+    return
 
 
 @app.cell
@@ -542,11 +514,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(available_tables, heading):
-    types_of_queries_hd = heading(2, "Types of queries", available_tables, number=True)
-    types_of_queries_hd
-    return (types_of_queries_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 8 Types of queries
+    """)
+    return
 
 
 @app.cell
@@ -562,11 +535,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, types_of_queries_hd):
-    select_query_hd = heading(2, "SELECT Query", types_of_queries_hd, number=True)
-    select_query_hd
-    return (select_query_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 9 SELECT Query
+    """)
+    return
 
 
 @app.cell
@@ -760,11 +734,12 @@ def _(query_output, simple_ledger_ui, sql_ui_hash_table_accounts):
     return
 
 
-@app.cell
-def _(heading, select_query_hd):
-    expressions_hd = heading(2, "Expressions", select_query_hd, number=True)
-    expressions_hd
-    return (expressions_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 10 Expressions
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -781,11 +756,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(expressions_hd, heading):
-    operators_hd = heading(3, "Operators", expressions_hd, number=True)
-    operators_hd
-    return (operators_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 10.1 Operators
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -857,11 +833,12 @@ def _(operators_ledger_ui, query_output, sql_ui_operators):
     return
 
 
-@app.cell
-def _(heading, operators_hd):
-    constants_hd = heading(3, "Constants", operators_hd, number=True)
-    constants_hd
-    return (constants_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 10.2 Constants
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -920,10 +897,11 @@ def _(query_output, simple_ledger_constants_ui, sql_ui_constants):
     return
 
 
-@app.cell
-def _(constants_hd, heading):
-    columns_functions_hd = heading(3, "Columns and Functions in expressions", constants_hd, number=True)
-    columns_functions_hd
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 10.3 Columns and Functions in expressions
+    """)
     return
 
 
@@ -999,11 +977,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(expressions_hd, heading):
-    more_on_tables_hd = heading(2, "More on tables", expressions_hd, number=True)
-    more_on_tables_hd
-    return (more_on_tables_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 11 More on tables
+    """)
+    return
 
 
 @app.cell
@@ -1014,11 +993,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, more_on_tables_hd):
-    postings_table_hd = heading(3, "The postings table", more_on_tables_hd, number=True)
-    postings_table_hd
-    return (postings_table_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 11.1 The postings table
+    """)
+    return
 
 
 @app.cell
@@ -1029,11 +1009,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, postings_table_hd):
-    transaction_columns_in_postings_hd = heading(4, "Transactions columns in the postings table", postings_table_hd, number=True)
-    transaction_columns_in_postings_hd
-    return (transaction_columns_in_postings_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 11.1.1 Transactions columns in the postings table
+    """)
+    return
 
 
 @app.cell
@@ -1167,11 +1148,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, transaction_columns_in_postings_hd):
-    hard_coded_joints_postings_transactions = heading(4, "The `entry` column", transaction_columns_in_postings_hd, number=True)
-    hard_coded_joints_postings_transactions
-    return (hard_coded_joints_postings_transactions,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 11.1.2 The `entry` column
+    """)
+    return
 
 
 @app.cell
@@ -1250,11 +1232,12 @@ def _(ledger_ui_with_meta, query_output, sql_ui_trans_meta):
     return
 
 
-@app.cell
-def _(hard_coded_joints_postings_transactions, heading):
-    other_accounts_column_hd = heading(4, "The `other_accounts` column", hard_coded_joints_postings_transactions, number=True)
-    other_accounts_column_hd
-    return (other_accounts_column_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 11.1.3 The `other_accounts` column
+    """)
+    return
 
 
 @app.cell
@@ -1336,11 +1319,12 @@ def _(other_accounts_ledger_ui, query_output, sql_ui_other_accounts_cash):
     return
 
 
-@app.cell
-def _(heading, other_accounts_column_hd):
-    balance_column_hd = heading(4, 'The `balance` column', other_accounts_column_hd, number=True)
-    balance_column_hd
-    return (balance_column_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 11.1.4 The `balance` column
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1453,10 +1437,11 @@ def _(
     return
 
 
-@app.cell
-def _(balance_column_hd, heading):
-    weight_hd = heading(4, "The `weight` column", balance_column_hd, number=True)
-    weight_hd
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 11.1.5 The `weight` column
+    """)
     return
 
 
@@ -1470,17 +1455,19 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, postings_table_hd):
-    transactions_table_hd = heading(3, "Transactions table", postings_table_hd, number=True)
-    transactions_table_hd
-    return (transactions_table_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 11.2 Transactions table
+    """)
+    return
 
 
-@app.cell
-def _(heading, transactions_table_hd):
-    id_column_dh = heading(4, "The `id` column", transactions_table_hd, number=True)
-    id_column_dh
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 11.2.1 The `id` column
+    """)
     return
 
 
@@ -1560,11 +1547,12 @@ def _(ledger_id_ui, query_output, sql_ui_id_print):
     return
 
 
-@app.cell
-def _(heading, more_on_tables_hd):
-    practical_conclusions_select_q_hd = heading(2, "Practical conclusions on using the SELECT Query", more_on_tables_hd, number=True)
-    practical_conclusions_select_q_hd
-    return (practical_conclusions_select_q_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 12 Practical conclusions on using the SELECT Query
+    """)
+    return
 
 
 @app.cell
@@ -1581,11 +1569,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, practical_conclusions_select_q_hd):
-    functions_hd = heading(2, "Functions", practical_conclusions_select_q_hd, number=True)
-    functions_hd
-    return (functions_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 13 Functions
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1639,11 +1628,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(functions_hd, heading):
-    aggregate_functions_and_q_hd = heading(3, "Aggregate functions and Aggregate Queries", functions_hd, number=True)
-    aggregate_functions_and_q_hd
-    return (aggregate_functions_and_q_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 13.1 Aggregate functions and Aggregate Queries
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1792,11 +1782,12 @@ def _(agg_ledger_ui, agg_query_without_groupby_ui, query_output):
     return
 
 
-@app.cell
-def _(aggregate_functions_and_q_hd, heading):
-    notable_functions_hd = heading(3, "Notable functions", aggregate_functions_and_q_hd, number=True)
-    notable_functions_hd
-    return (notable_functions_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 13.2 Notable functions
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1807,11 +1798,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, notable_functions_hd):
-    sum_function_hd = heading(4, "SUM()", notable_functions_hd, number=True)
-    sum_function_hd
-    return (sum_function_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 13.2.1 SUM()
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1948,10 +1940,11 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, sum_function_hd):
-    units_costs_func_hd = heading(4, "UNITS(), COST()", sum_function_hd, number=True)
-    units_costs_func_hd
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 13.2.2 UNITS(), COST()
+    """)
     return
 
 
@@ -2034,10 +2027,11 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, sum_function_hd):
-    convert_func_hd = heading(4, "CONVERT()", sum_function_hd, number=True)
-    convert_func_hd
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 13.2.3 CONVERT()
+    """)
     return
 
 
@@ -2049,10 +2043,11 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, sum_function_hd):
-    root_function_hd = heading(4, "ROOT()", sum_function_hd, number=True)
-    root_function_hd
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 13.2.4 ROOT()
+    """)
     return
 
 
@@ -2064,18 +2059,20 @@ def _(mo):
     return
 
 
-@app.cell
-def _(functions_hd, heading):
-    controlling_results_hd = heading(2, "Controlling query results", functions_hd, number=True)
-    controlling_results_hd
-    return (controlling_results_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 14 Controlling query results
+    """)
+    return
 
 
-@app.cell
-def _(controlling_results_hd, heading):
-    distinct_hd = heading(3, "DISTINCT", controlling_results_hd, number=True)
-    distinct_hd
-    return (distinct_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 14.1 DISTINCT
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -2088,11 +2085,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(distinct_hd, heading):
-    order_by_hd = heading(3, "ORDER BY", distinct_hd, number=True)
-    order_by_hd
-    return (order_by_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 14.2 ORDER BY
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -2117,10 +2115,11 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, order_by_hd):
-    limit_hd = heading(3, "LIMIT", order_by_hd, number=True)
-    limit_hd
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 14.3 LIMIT
+    """)
     return
 
 
@@ -2138,11 +2137,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(controlling_results_hd, heading):
-    statement_operators_hd = heading(2, "Statement operators (OPEN ON, CLOSE ON, CLEAR)", controlling_results_hd, number=True)
-    statement_operators_hd
-    return (statement_operators_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 15 Statement operators (OPEN ON, CLOSE ON, CLEAR)
+    """)
+    return
 
 
 @app.cell
@@ -2204,11 +2204,12 @@ def _(ledger_editor):
     return (ledger_ui_open_close,)
 
 
-@app.cell
-def _(heading, statement_operators_hd):
-    openning_period_hd = heading(4, "Opening a Period (OPEN ON clause)", statement_operators_hd, number=True)
-    openning_period_hd
-    return (openning_period_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 15.0.1 Opening a Period (OPEN ON clause)
+    """)
+    return
 
 
 @app.cell
@@ -2331,11 +2332,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, openning_period_hd):
-    closing_period_hd = heading(4, "Closing a Period (CLOSE ON clause)", openning_period_hd, number=True)
-    closing_period_hd
-    return (closing_period_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 15.0.2 Closing a Period (CLOSE ON clause)
+    """)
+    return
 
 
 @app.cell
@@ -2389,11 +2391,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(closing_period_hd, heading):
-    clearing_period_hd = heading(4, "Clearing Income & Expenses (CLEAR clause)", closing_period_hd, number=True)
-    clearing_period_hd
-    return (clearing_period_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 15.0.3 Clearing Income & Expenses (CLEAR clause)
+    """)
+    return
 
 
 @app.cell
@@ -2496,11 +2499,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(clearing_period_hd, heading):
-    open_close_clear_hd = heading(4, "Example Statements", clearing_period_hd, number=True)
-    open_close_clear_hd
-    return (open_close_clear_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 15.0.4 Example Statements
+    """)
+    return
 
 
 @app.cell
@@ -2588,11 +2592,12 @@ def _(ledger_ui_open_close, query_output, sql_ui_bal_sheet):
     return
 
 
-@app.cell
-def _(heading, open_close_clear_hd):
-    high_level_shortcuts_hd = heading(2, "High-level shortcuts (JOURNAL, BALANCE, PRINT)", open_close_clear_hd, number=True)
-    high_level_shortcuts_hd
-    return (high_level_shortcuts_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 16 High-level shortcuts (JOURNAL, BALANCE, PRINT)
+    """)
+    return
 
 
 @app.cell
@@ -2636,11 +2641,12 @@ def _(ledger_editor):
     return (ledger_ui_journal,)
 
 
-@app.cell
-def _(heading, high_level_shortcuts_hd):
-    journal_hd = heading(3, "Selecting Journals (JOURNAL query)", high_level_shortcuts_hd, number=True)
-    journal_hd
-    return (journal_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 16.1 Selecting Journals (JOURNAL query)
+    """)
+    return
 
 
 @app.cell
@@ -2690,11 +2696,12 @@ def _(ledger_ui_journal, query_output, sql_ui_journal_balance):
     return
 
 
-@app.cell
-def _(heading, journal_hd):
-    balances_hd = heading(3, "Selecting Balances (BALANCES query)", journal_hd, number=True)
-    balances_hd
-    return (balances_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 16.2 Selecting Balances (BALANCES query)
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -2797,10 +2804,11 @@ def _(ledger_ui_journal, query_output, sql_ui_balances_where_per_account):
     return
 
 
-@app.cell
-def _(balances_hd, heading):
-    print_hd = heading(3, "Print (PRINT query)", balances_hd, number=True)
-    print_hd
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 16.3 Print (PRINT query)
+    """)
     return
 
 
@@ -2845,11 +2853,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, high_level_shortcuts_hd):
-    beanquery_with_dataframe_hd = heading(2, "Usage of beanquery with Data Frame", high_level_shortcuts_hd, number=True)
-    beanquery_with_dataframe_hd
-    return (beanquery_with_dataframe_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 17 Usage of beanquery with Data Frame
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -2860,11 +2869,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(beanquery_with_dataframe_hd, heading):
-    working_around_limitations_hd = heading(2, "Working around beanquery limitations", beanquery_with_dataframe_hd, number=True)
-    working_around_limitations_hd
-    return (working_around_limitations_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 18 Working around beanquery limitations
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -2886,11 +2896,12 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, working_around_limitations_hd):
-    queries_for_typical_situations_hd = heading(2, "Example queries for typical situations", working_around_limitations_hd, number=True)
-    queries_for_typical_situations_hd
-    return (queries_for_typical_situations_hd,)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## 19 Example queries for typical situations
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -2903,10 +2914,11 @@ def _(mo):
     return
 
 
-@app.cell
-def _(heading, queries_for_typical_situations_hd):
-    net_worth_multy_commodity_hd = heading(3, "Net Worth and P&L-like reports in multi-commodities ledger", queries_for_typical_situations_hd, number=True)
-    net_worth_multy_commodity_hd
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 19.1 Net Worth and P&L-like reports in multi-commodities ledger
+    """)
     return
 
 

@@ -50,7 +50,7 @@ wheels = [
 
 [[package]]
 name = "beanquery-interactive-manual"
-version = "0.1.1.dev0"
+version = "0.1.1"
 source = { virtual = "." }
 dependencies = [
     { name = "beancount" },
