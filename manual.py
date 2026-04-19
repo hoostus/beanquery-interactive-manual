@@ -243,15 +243,27 @@ def _(mo):
     This document is written as a [marimo](https://docs.marimo.io/) notebook. You can read it as a normal HTML document.
     However, the cool feature of this notebook is that if you run it as a marimo notebook, you can interact with the document by changing the default text for both the ledger and the query in all examples. As soon as an input widget loses focus, the query is re-executed and the output is updated.
 
-    Both in HTML format and in the marimo notebook format, a clickable table of contents is available when hovering near the right side of the browser's vertical scroll bar.
+    Both in HTML format and in the marimo notebook format, a clickable table of contents becomes available when hovering near the right side of the browser's vertical scroll bar.
+    """)
+    return
 
-    Note that throughout the document, unresolved questions the author had about beanquery functionality are marked with double question marks.
 
-    E.g.: ?? Why do we need this.
+@app.cell
+def _(mo):
+    mo.image(src = "images/TOC.png", width="40%")
+    return
 
-    There are also some TODOs, marked with #TODO.
 
-    E.g.: _#TODO: we need to investigate this_
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Note that throughout the document, unresolved questions the author had about beanquery functionality are marked with double question marks. E.g:
+
+    ?? Why do we need this.
+
+    There are also some TODOs, marked with #TODO. E.g.:
+
+    _#TODO: we need to investigate this_
     """)
     return
 
