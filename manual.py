@@ -225,9 +225,9 @@ def _(mo):
 
     E.g.: ?? Why do we need this.
 
-    There are also some TODOs, marked with #TODO.
+    There are also some TODOs, marked with #TODO. E.g.:
 
-    E.g.: _#TODO: we need to investigate this_
+    _#TODO: we need to investigate this_
     """)
     return
 
