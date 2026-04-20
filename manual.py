@@ -2026,7 +2026,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    Beancount offers a first class support for multi currency accounting. The `CONVERT()` function is an important element of it.
+    Beancount offers first-class support for multi-currency accounting. The `CONVERT()` function is a key element of it.
 
     ```
     convert(amount, str)
@@ -2042,14 +2042,14 @@ def _(mo):
       Coerce an inventory to a particular currency.
     ```
 
-    * the first argument of the  function is amount, position or inventory, which have to be converted.
-    * the second argument is a target commodity to which the 1st argument needs to be converted
-    * the 3rd (optional) argument is a date  at which an exchange rate between commodities has to be picked for conversion. Note that:
-      - the function picks the latest price, available on on before (but not after) the specified date
-      - if the date is omitted, the latest price available is picked (?? it is questionable whether it has any practical financial usage)
+    * The first argument is the amount, position, or inventory to be converted.
+    * The second argument is the target commodity to convert to.
+    * The third (optional) argument is the date at which the exchange rate is looked up. Note that:
+      - the function picks the latest price available on or before (but not after) the specified date
+      - if the date is omitted, the latest available price is used (?? this may have limited practical financial meaning)
 
-    * even thought not mentioned explicitly, for it to function the `CONVERT()` function is using an information available the **prices** table. The **prices** tables is built based on the information provided by the **price** directive. But beanquery hides this complexity from the users.
-    * prices specification is reciprocal. In another words the following 2 entries are equivalent:
+    * Even though not mentioned explicitly, `CONVERT()` internally uses the **prices** table, which is populated by `price` directives. Beanquery hides this complexity from users.
+    * Price specifications are reciprocal. In other words, the following two entries are equivalent:
       ```
       2024-01-01 price XXX 2.0 YYY
       ```
@@ -2057,12 +2057,12 @@ def _(mo):
       2024-01-01 price YYY 0.5 XXX
       ```
 
-    Practically, in terms of usage of the parameter `date` several options are possible:
-    * specify a specific date (e.g. `2023-01-02`). This would normally be used in the queries, which convert **Assets** and **Liabilities** to a target currency. This is because following accepted accounting practices, **Assets** and **Liabilities** are translated into the reporting currency using the exchange rate in effect on the date of the **Net Worth report**.
-    * put a `date` column as a date parameter of the `CONVERT()` function. In this case the `CONVERT()` function uses the of the posting date to determine an exchange rate, hence for each posting the rate may be different. This would normally be used to convert **Income** and **Expenses** to a target currency. This is because inline with accepted accounting practices **Income** and **Expenses** are translated into the reporting currency using the exchange rate in effect on the transaction date.
-    * do not specify the date parameter at all. In this case the `CONVERT()` function will use the latest available exchange rate (?? Not sure it has any accounting meaning )
+    In practice, there are several ways to use the `date` parameter:
+    * Specify a fixed date (e.g. `2023-01-02`). This is typically used in queries that convert **Assets** and **Liabilities** to a target currency, since under accepted accounting practices these are translated using the exchange rate in effect on the date of the **Net Worth report**.
+    * Pass the `date` column as the date parameter. In this case `CONVERT()` uses the posting date to look up the exchange rate, so each posting may use a different rate. This is typically used to convert **Income** and **Expenses**, since under accepted accounting practices these are translated using the exchange rate in effect on the transaction date.
+    * Omit the date parameter entirely. In this case `CONVERT()` uses the latest available exchange rate (this may have limited accounting meaning).
 
-    Let us demonstrate this on the simple example:
+    Let us demonstrate this with a simple example:
     """)
     return
 
@@ -2115,9 +2115,9 @@ def _(convert_ledger_ui, convert_query_ui, query_output):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    If there is no exchange rate available, the `CONVERT()` function returns the value in original currency.
+    If no exchange rate is available, `CONVERT()` returns the value in the original currency.
 
-    E.g. let us try to convert previously used ledger to EUR.
+    For example, let us try to convert the previous ledger to EUR.
     """)
     return
 
@@ -2143,9 +2143,9 @@ def _(convert_ledger_ui, convert_query_not_convert_ui, query_output):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    When converting a position with a cost, the `CONVERT()` function returns the convertion of `UNITS` and ignores the cost.
+    When converting a position that has a cost, `CONVERT()` converts the `UNITS` amount and ignores the cost.
 
-    Note, that in the below example the purchasing price is deliberately set different from the official exchange rate, specified by the `price` directive to show that the `CONVERT()` function only uses the exchange rate from the `price` directive.
+    In the example below, the purchase price is deliberately set differently from the official exchange rate specified by the `price` directive, to illustrate that `CONVERT()` uses only the rate from the `price` directive.
     """)
     return
 
@@ -2198,7 +2198,7 @@ def _(convert_ledger_with_cost_ui, convert_with_cost_query_ui, query_output):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    In case of an aggregate query one can either convert an inventory, created by the `SUM()` function or sum the results of the `CONVERT()` function. Note that the former is not possible if different exchange rate needs to be applied to every posting (when the `date` column is used instead of specifying the specific date).
+    For aggregate queries, you can either convert an inventory created by `SUM()`, or sum the results of `CONVERT()`. Note that the former approach is not possible when a different exchange rate must be applied to each posting (i.e., when the `date` column is used instead of a fixed date).
     """)
     return
 

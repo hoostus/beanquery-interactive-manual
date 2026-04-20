@@ -41,3 +41,7 @@ The interactive cells wire together `ledger_editor` + `query_editor` outputs int
 
 - `develop` — active development
 - `main` — stable/published releases; PRs merge here
+
+## Improving English language style guide:
+
+- Do not remove ?? and #TODO from the text, when asked to improve English, as these are deliberately left there
