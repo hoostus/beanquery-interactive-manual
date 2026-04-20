@@ -2010,8 +2010,64 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    _#TODO: add some info_
+    ```
+    convert(amount, str)
+    convert(amount, str, date)
+    convert(position, str)
+    convert(position, str, date)
+      Coerce an amount to a particular currency.
+
+    convert(inventory, str)
+    convert(inventory, str, date)
+      Coerce an inventory to a particular currency.
+    ```
     """)
+    return
+
+
+@app.cell
+def _(ledger_editor):
+    _ledger = """\
+
+    2023-01-01 open Assets:Bank 
+    2023-01-01 open Expenses:Misc
+
+    2023-01-01 price USD 1 TUG
+    2023-01-01 * "Shopping 1" 
+        Assets:Bank  -1 USD
+        Expenses:Misc 1 USD
+
+    2023-01-02 price USD 10 TUG
+    2023-01-02 * "Shopping 2" 
+        Assets:Bank  -1 USD
+        Expenses:Misc 1 USD
+
+
+    2023-01-03 price USD 100 TUG
+    """
+
+    convert_ledger_ui = ledger_editor(_ledger, label="Ledger for convert function demo")
+    convert_ledger_ui
+    return (convert_ledger_ui,)
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT date, narration, account, position, 
+           convert(position, "TUG", date) as in_tug_with_date, 
+           convert(position, "TUG", 2023-01-02) as in_tug_with_fixed_date,
+           convert(position, "TUG") as in_tug_no_date
+    WHERE account = "Expenses:Misc"
+    """
+    convert_query_ui = query_editor(_sql, label="CONVERT() function demo")
+    convert_query_ui
+    return (convert_query_ui,)
+
+
+@app.cell
+def _(convert_ledger_ui, convert_query_ui, query_output):
+    query_output(convert_ledger_ui.value, convert_query_ui.value)
     return
 
 
