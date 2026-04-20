@@ -37,14 +37,6 @@ def _(mo):
     return
 
 
-@app.cell
-def _(mo):
-    mo.md("""
- 
-    """)
-    return
-
-
 @app.cell(hide_code=True)
 def _():
     import marimo as mo
@@ -2145,6 +2137,94 @@ def _(query_editor):
 @app.cell
 def _(convert_ledger_ui, convert_query_not_convert_ui, query_output):
     query_output(convert_ledger_ui.value, convert_query_not_convert_ui.value)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    When converting a position with a cost, the `CONVERT()` function returns the convertion of `UNITS` and ignores the cost.
+
+    Note, that in the below example the purchasing price is deliberately set different from the official exchange rate, specified by the `price` directive to show that the `CONVERT()` function only uses the exchange rate from the `price` directive.
+    """)
+    return
+
+
+@app.cell
+def _(ledger_editor):
+    _ledger = """\
+    2023-01-01 open Assets:Bank
+    2023-01-01 open Assets:Investment
+    2023-01-01 open Income:Salary
+
+
+    2023-01-01 * "Salary"
+      Income:Salary   -5000 USD
+      Assets:Bank      5000 USD
+
+    2023-01-01 price IVV 10 USD
+    2023-01-01 * "Investment 1"
+      Assets:Investment    1 IVV {15 USD} ; <= purchasing at the price, different from the "official price" (10 USD) on the same day
+      Assets:Bank         -15 USD
+
+    2023-01-02 price IPP 100 USD
+    2023-01-02 * "Investment 2"
+       Assets:Investment    1 IPP {150 USD} ; <= purchasing at the price, different from the "official price" (100 USD) on the same day
+       Assets:Bank         -150 USD
+      """
+    convert_ledger_with_cost_ui = ledger_editor(_ledger, label="Ledger for CONVERT() demo with cost")
+    convert_ledger_with_cost_ui
+    return (convert_ledger_with_cost_ui,)
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT date, account, narration, position, convert(position, "USD", 2023-01-31) as position_in_usd
+    WHERE account = "Assets:Investment"
+    """
+
+    convert_with_cost_query_ui = query_editor(_sql, label="CONVERT() with cost example")
+    convert_with_cost_query_ui
+    return (convert_with_cost_query_ui,)
+
+
+@app.cell
+def _(convert_ledger_with_cost_ui, convert_with_cost_query_ui, query_output):
+    query_output(convert_ledger_with_cost_ui.value, convert_with_cost_query_ui.value)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    In case of an aggregate query one can either convert an inventory, created by the `SUM()` function or sum the results of the `CONVERT()` function. Note that the former is not possible if different exchange rate needs to be applied to every posting (when the `date` column is used instead of specifying the specific date).
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT 
+         account, 
+         convert(sum(position), "USD", 2023-01-31) as total_converted_to_usd,
+         sum(convert(position, "USD", 2023-01-31)) as sum_of_converted_to_usd
+    WHERE 
+         account = "Assets:Investment"
+    """
+    convert_with_cost_agg_query_ui = query_editor(_sql, label="CONVERT() with cost example for aggregate query")
+    convert_with_cost_agg_query_ui
+    return (convert_with_cost_agg_query_ui,)
+
+
+@app.cell
+def _(
+    convert_ledger_with_cost_ui,
+    convert_with_cost_agg_query_ui,
+    query_output,
+):
+    query_output(convert_ledger_with_cost_ui.value, convert_with_cost_agg_query_ui.value)
     return
 
 

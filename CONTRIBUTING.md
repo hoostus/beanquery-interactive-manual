@@ -22,7 +22,9 @@ These are simple steps to do this
    ```
    uv run marimo edit manual.py
    ```
-6. Make and save desired changes to the notebook.  
+6. Make and save desired changes to the notebook.  When making changes, follow these rules:
+   * if new section(s) and hence new heading(s) added, to not renumber existing headings and do not add numbering to a new heading
+  
 7. Commit changes to the git repository
    ```
    git add .
@@ -32,7 +34,7 @@ These are simple steps to do this
    ```
    git push
    ```
-9. Create a pull request from your fork to the `develop` branch following [official instructions](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork).
+9.  Create a pull request from your fork to the `develop` branch following [official instructions](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork).
 
 
  
