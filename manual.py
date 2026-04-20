@@ -55,7 +55,7 @@ def _():
     from beanquery.query_render import render_text
 
 
-    def get_beanquery_output(ledger_text: str, query: str) -> str:
+    def get_beanquery_output(ledger_text: str, query: str, narrow: bool = True) -> str:
         entries, errors, options_map = load_string(ledger_text)
 
         if errors:
@@ -84,7 +84,7 @@ def _():
                 bc_printer.print_entries(entries, file=buf)
             else:
                 # SELECT output
-                render_text(rtypes, rrows, dcontext, buf)
+                render_text(rtypes, rrows, dcontext, buf, narrow=narrow)
 
             return buf.getvalue()
 
@@ -111,18 +111,20 @@ def _():
                 return '\n'.join(out)
             return f"error: {type(e).__name__}: {e}"
 
-    def query_output(ledger_text: str, query: str) -> mo.Html:
+    def query_output(ledger_text: str, query: str, narrow: bool = False) -> mo.Html:
         """
         Runs a BeanQuery and returns the result as a marimo plain_text element.
 
         Args:
             ledger_text: Beancount ledger as text
             query: BeanQuery query string
+            narrow: When True, truncate column headers to the width of the data
+                    (equivalent to the beanquery shell's 'narrow' variable).
 
         Returns:
             mo.Html: formatted output for display
         """
-        return mo.plain_text(get_beanquery_output(ledger_text, query))
+        return mo.plain_text(get_beanquery_output(ledger_text, query, narrow=narrow))
 
 
     def ledger_editor(default_text: str, label: str = ""):
@@ -328,6 +330,12 @@ def _(mo):
 
     **Shell variables**
     The interactive shell has a few “set” variables that you can customize to change some of the behavior of the shell. These are like environment variables. Refer to **Appendix A for more information.**
+
+    Note, that in this document for demonstration purposes the following changes are done to default environmental variables:
+
+    ```
+    .set narrow false
+    ```
     """)
     return
 
@@ -2010,17 +2018,30 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
+    Beancount offers a first class support for multi currency accounting. The `CONVERT()` function is an important element of it.
+
     ```
     convert(amount, str)
     convert(amount, str, date)
+      Coerce an amount to a particular currency.
+
     convert(position, str)
     convert(position, str, date)
-      Coerce an amount to a particular currency.
+      Coerce a position to a particular currency.
 
     convert(inventory, str)
     convert(inventory, str, date)
       Coerce an inventory to a particular currency.
     ```
+
+    Note, that even thought not mentioned explicitly, for it to function the `CONVERT()` function is using an information available the **prices** table ( the **prices** tables is built based on the information provided by the **price** directive). But beanquery hides this complexity from the users.
+
+    In terms of usage of the parameter `date` several options are possible:
+    * specify a specific date (e.g. `2023-01-02`). This would normally be used in the queries, which convert **Assets** and **Liabilities** to a target currency. This is because following accepted accounting practices, **Assets** and **Liabilities** are translated into the reporting currency using the exchange rate in effect on the date of the **Net Worth report**.
+    * put a `date` column as a date parameter of the `CONVERT()` function. In this case the `CONVERT()` function uses the of the posting date to determine an exchange rate, hence for each posting the rate may be different. This would normally be used to convert **Income** and **Expenses** to a target currency. This is because inline with accepted accounting practices **Income** and **Expenses** are translated into the reporting currency using the exchange rate in effect on the transaction date.
+    * do not specify the date parameter at all. In this case the `CONVERT()` function will use the latest available exchange rate (?? Not sure it has any accounting meaning )
+
+    Let us demonstrate this on the simple example:
     """)
     return
 
@@ -2033,15 +2054,14 @@ def _(ledger_editor):
     2023-01-01 open Expenses:Misc
 
     2023-01-01 price USD 1 TUG
-    2023-01-01 * "Shopping 1" 
+    2023-01-01 * "Shopping 1 USD" 
         Assets:Bank  -1 USD
         Expenses:Misc 1 USD
 
     2023-01-02 price USD 10 TUG
-    2023-01-02 * "Shopping 2" 
+    2023-01-02 * "Shopping 2 USD" 
         Assets:Bank  -1 USD
         Expenses:Misc 1 USD
-
 
     2023-01-03 price USD 100 TUG
     """
@@ -2055,9 +2075,9 @@ def _(ledger_editor):
 def _(query_editor):
     _sql = """\
     SELECT date, narration, account, position, 
-           convert(position, "TUG", date) as in_tug_with_date, 
-           convert(position, "TUG", 2023-01-02) as in_tug_with_fixed_date,
-           convert(position, "TUG") as in_tug_no_date
+           convert(position, "TUG", date) as in_TUG_with_date, 
+           convert(position, "TUG", 2023-01-02) as in_TUG_with_fixed_date,
+           convert(position, "TUG") as in_TUG_no_date
     WHERE account = "Expenses:Misc"
     """
     convert_query_ui = query_editor(_sql, label="CONVERT() function demo")
@@ -2068,6 +2088,34 @@ def _(query_editor):
 @app.cell
 def _(convert_ledger_ui, convert_query_ui, query_output):
     query_output(convert_ledger_ui.value, convert_query_ui.value)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    If there is no exchange rate available, the `CONVERT()` function returns the value in original currency.
+
+    E.g. let us try to convert previously used ledger to EUR.
+    """)
+    return
+
+
+@app.cell
+def _(query_editor):
+    _sql = """\
+    SELECT date, narration, account, position, 
+           convert(position, "EUR", date) as in_EUR_with_date
+    WHERE account = "Expenses:Misc"
+    """
+    convert_query_not_convert_ui = query_editor(_sql, label="CONVERT() function demo for non-convertible currency")
+    convert_query_not_convert_ui
+    return (convert_query_not_convert_ui,)
+
+
+@app.cell
+def _(convert_ledger_ui, convert_query_not_convert_ui, query_output):
+    query_output(convert_ledger_ui.value, convert_query_not_convert_ui.value)
     return
 
 
