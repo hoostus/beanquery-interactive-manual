@@ -17,6 +17,9 @@ app = marimo.App(width="medium", css_file="custom.css")
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
+    <a href="https://github.com/Ev2geny/beanquery_interactive_manual" target="_blank">
+      <img src="https://img.shields.io/badge/GitHub-Ev2geny%2Fbeanquery__interactive__manual-blue?logo=github" alt="GitHub repository"/>
+    </a>
     # Interactive beanquery manual
     """)
     return
