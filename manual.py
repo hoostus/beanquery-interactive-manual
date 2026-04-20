@@ -20,6 +20,7 @@ def _(mo):
     <a href="https://github.com/Ev2geny/beanquery_interactive_manual" target="_blank">
       <img src="https://img.shields.io/badge/GitHub-Ev2geny%2Fbeanquery__interactive__manual-blue?logo=github" alt="GitHub repository"/>
     </a>
+
     # Interactive beanquery manual
     """)
     return
@@ -215,7 +216,19 @@ def _(mo):
     However, the cool feature of this notebook is that if you run it as a marimo notebook, you can interact with the document by changing the default text for both the ledger and the query in all examples. As soon as an input widget loses focus, the query is re-executed and the output is updated.
 
     Both in HTML format and in the marimo notebook format, a clickable table of contents is available when hovering near the right side of the browser's vertical scroll bar.
+    """)
+    return
 
+
+@app.cell
+def _(mo):
+    mo.image(src = "images/TOC.png", width="40%")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
     Note that throughout the document, unresolved questions the author had about beanquery functionality are marked with double question marks.
 
     E.g.: ?? Why do we need this.
@@ -2037,9 +2050,22 @@ def _(mo):
       Coerce an inventory to a particular currency.
     ```
 
-    Note, that even thought not mentioned explicitly, for it to function the `CONVERT()` function is using an information available the **prices** table ( the **prices** tables is built based on the information provided by the **price** directive). But beanquery hides this complexity from the users.
+    * the first argument of the  function is amount, position or inventory, which have to be converted.
+    * the second argument is a target commodity to which the 1st argument needs to be converted
+    * the 3rd (optional) argument is a date  at which an exchange rate between commodities has to be picked for conversion. Note that:
+      - the function picks the latest price, available on on before (but not after) the specified date
+      - if the date is omitted, the latest price available is picked (?? it is questionable whether it has any practical financial usage)
 
-    In terms of usage of the parameter `date` several options are possible:
+    * even thought not mentioned explicitly, for it to function the `CONVERT()` function is using an information available the **prices** table. The **prices** tables is built based on the information provided by the **price** directive. But beanquery hides this complexity from the users.
+    * prices specification is reciprocal. In another words the following 2 entries are equivalent:
+      ```
+      2024-01-01 price XXX 2.0 YYY
+      ```
+      ```
+      2024-01-01 price YYY 0.5 XXX
+      ```
+
+    Practically, in terms of usage of the parameter `date` several options are possible:
     * specify a specific date (e.g. `2023-01-02`). This would normally be used in the queries, which convert **Assets** and **Liabilities** to a target currency. This is because following accepted accounting practices, **Assets** and **Liabilities** are translated into the reporting currency using the exchange rate in effect on the date of the **Net Worth report**.
     * put a `date` column as a date parameter of the `CONVERT()` function. In this case the `CONVERT()` function uses the of the posting date to determine an exchange rate, hence for each posting the rate may be different. This would normally be used to convert **Income** and **Expenses** to a target currency. This is because inline with accepted accounting practices **Income** and **Expenses** are translated into the reporting currency using the exchange rate in effect on the transaction date.
     * do not specify the date parameter at all. In this case the `CONVERT()` function will use the latest available exchange rate (?? Not sure it has any accounting meaning )
